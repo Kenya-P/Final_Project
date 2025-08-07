@@ -49,35 +49,31 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <Router>
-          <Header />
-          <Routes>
-            <Route path="/" element={<Main />} />
-            <Route 
-            path="/profile" 
+        <Header />
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route
+            path="/profile"
             element={
-              <ProtectedRoute 
-                element={Profile} 
-                isLoggedIn={!!currentUser} 
-              />
-            } 
+              <ProtectedRoute element={Profile} isLoggedIn={!!currentUser} />
+            }
           />
-            
-          </Routes>
+        </Routes>
 
-          <LoginModal
-            isOpen={isLoginOpen}
-            onClose={() => setIsLoginOpen(false)}
-            onLogin={handleLogin}
-          />
+        <LoginModal
+          isOpen={isLoginOpen}
+          onClose={() => setIsLoginOpen(false)}
+          onLogin={handleLogin}
+        />
 
-          <RegisterModal
-            isOpen={isRegisterOpen}
-            onClose={() => setIsRegisterOpen(false)}
-            onRegister={handleRegister}
-          />
+        <RegisterModal
+          isOpen={isRegisterOpen}
+          onClose={() => setIsRegisterOpen(false)}
+          onRegister={handleRegister}
+        />
 
-          {loginError && <p className="error">{loginError}</p>}
-    </Router>
+        {loginError && <p className="error">{loginError}</p>}
+      </Router>
     </CurrentUserContext.Provider>
   );
 }

@@ -23,7 +23,9 @@ function ModalWithForm({ isOpen, onClose, children, title }) {
   return (
     <div className="modal" onClick={handleOutsideClick}>
       <div className="modal__container">
-        <button className="modal__close" onClick={onClose}>×</button>
+        <button className="modal__close" onClick={onClose}>
+          ×
+        </button>
         <h2 className="modal__title">{title}</h2>
         {children}
       </div>
@@ -32,4 +34,3 @@ function ModalWithForm({ isOpen, onClose, children, title }) {
 }
 
 export default ModalWithForm;
-

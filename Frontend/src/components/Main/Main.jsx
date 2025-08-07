@@ -31,7 +31,9 @@ function Main() {
       {error && <p className="main__message main__message--error">{error}</p>}
 
       {!loading && pets.length === 0 && (
-        <p className="main__message">No pets found. Try adjusting your filters.</p>
+        <p className="main__message">
+          No pets found. Try adjusting your filters.
+        </p>
       )}
 
       <div className="main__grid">

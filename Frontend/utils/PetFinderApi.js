@@ -1,4 +1,3 @@
-
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
 
 /**
@@ -11,7 +10,7 @@ export function _handleResponse(res) {
   }
 
   return res.text().then((text) => {
-    console.error("Response error text:", text);
+    console.error('Response error text:', text);
     return Promise.reject(`Error ${res.status}: ${text}`);
   });
 }
@@ -20,7 +19,7 @@ function request(url, options) {
   return fetch(url, options)
     .then(_handleResponse)
     .catch((error) => {
-      console.error("API error:", error);
+      console.error('API error:', error);
       throw error;
     });
 }
@@ -30,34 +29,32 @@ function getAuthHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-
 function getPets() {
   return request(`${BASE_URL}/api/pets`, {
     method: 'GET',
     headers: {
-        ...getAuthHeaders(),
-        "Content-Type": "application/json",
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
     },
   });
 }
 
 function getPetById(id) {
-    return request(`${BASE_URL}/api/pets/${id}`, {
-        method: 'GET',
-        headers: {
-            ...getAuthHeaders(),
-            "Content-Type": "application/json",
+  return request(`${BASE_URL}/api/pets/${id}`, {
+    method: 'GET',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
     },
   });
 }
 
-
 function getUserPets() {
-    return request(`${BASE_URL}/api/user/pets`, {
-        method: 'GET',
-        headers: {
-            ...getAuthHeaders(),
-            "Content-Type": "application/json",
+  return request(`${BASE_URL}/api/user/pets`, {
+    method: 'GET',
+    headers: {
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
     },
   });
 }
@@ -72,20 +69,19 @@ function registerUser(userData) {
   });
 }
 
-
 function logIn(credentials) {
-    return request(`${BASE_URL}/login`, {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-    }).then((data) => {
-        if (data.token) {
-        localStorage.setItem('petfinder_token', data.token);
-        }
-        return data;
-    });
+  return request(`${BASE_URL}/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  }).then((data) => {
+    if (data.token) {
+      localStorage.setItem('petfinder_token', data.token);
+    }
+    return data;
+  });
 }
 
 function logOut() {
@@ -97,8 +93,8 @@ function likePet(petId) {
   return request(`${BASE_URL}/api/pets/${petId}/like`, {
     method: 'PUT',
     headers: {
-        ...getAuthHeaders(),
-        "Content-Type": "application/json",
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ petId }),
   });
@@ -107,8 +103,8 @@ function unlikePet(petId) {
   return request(`${BASE_URL}/api/pets/${petId}/unlike`, {
     method: 'DELETE',
     headers: {
-        ...getAuthHeaders(),
-        "Content-Type": "application/json",
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ petId }),
   });
@@ -118,20 +114,20 @@ function removePet(petId) {
   return request(`${BASE_URL}/api/pets/${petId}`, {
     method: 'DELETE',
     headers: {
-        ...getAuthHeaders(),
-        "Content-Type": "application/json",
+      ...getAuthHeaders(),
+      'Content-Type': 'application/json',
     },
   });
 }
 
-export { 
-    getPets, 
-    getPetById, 
-    getUserPets, 
-    registerUser, 
-    logIn, 
-    logOut,
-    likePet,
-    unlikePet,
-    removePet
+export {
+  getPets,
+  getPetById,
+  getUserPets,
+  registerUser,
+  logIn,
+  logOut,
+  likePet,
+  unlikePet,
+  removePet,
 };
