@@ -1,0 +1,32 @@
+.main {
+  padding: 32px;
+  background-color: #fafafa;
+}
+
+.main__title {
+  font-size: 28px;
+  margin-bottom: 24px;
+  color: #333;
+  text-align: center;
+}
+
+.main__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  justify-items: center;
+  align-items: stretch;
+  padding: 0;
+}
+
+.main__message {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.main__message--error {
+  color: red;
+}
+
