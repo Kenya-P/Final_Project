@@ -1,42 +1,35 @@
 import React, { useEffect } from 'react';
 import './ModalWithForm.css';
 
-function ModalWithForm({ title, children, isOpen, onClose, onSubmit }) {
+function ModalWithForm({ isOpen, onClose, children, title }) {
+  // Close on ESC
   useEffect(() => {
-    function handleEscClose(e) {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscClose);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscClose);
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') onClose();
     };
-  }, [isOpen, onClose]);
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
 
-  function handleOverlayClick(e) {
+  // Close on outside click
+  const handleOutsideClick = (e) => {
     if (e.target.classList.contains('modal')) {
       onClose();
     }
-  }
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className={`modal ${isOpen ? 'modal_opened' : ''}`} onClick={handleOverlayClick}>
+    <div className="modal" onClick={handleOutsideClick}>
       <div className="modal__container">
-        <button type="button" className="modal__close-button" onClick={onClose}>
-          &times;
-        </button>
+        <button className="modal__close" onClick={onClose}>×</button>
         <h2 className="modal__title">{title}</h2>
-        <form className="modal__form" onSubmit={onSubmit}>
-          {children}
-        </form>
+        {children}
       </div>
     </div>
   );
 }
 
 export default ModalWithForm;
+

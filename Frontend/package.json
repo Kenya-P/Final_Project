@@ -10,6 +10,11 @@
     "format": "prettier --write .",
     "preview": "vite preview"
   },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

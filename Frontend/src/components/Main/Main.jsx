@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getPets } from '../utils/PetFinderApi';
-import PetCard from '../components/PetCard/PetCard';
+import PetCard from '../PetCard/PetCard';
+import Preloader from '../Preloader/Preloader';
 import './Main.css';
 
 function Main() {
@@ -9,10 +10,6 @@ function Main() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    getPets().then(setPets).catch(console.error);
-  }, []);
-
-    useEffect(() => {
     getPets()
       .then((data) => {
         setPets(data);
@@ -26,11 +23,13 @@ function Main() {
   }, []);
 
   return (
-  <section className="main">
+    <section className="main">
       <h2 className="main__title">Find your perfect pet</h2>
 
-      {loading && <p className="main__message">Loading pets...</p>}
+      {loading && <Preloader />}
+
       {error && <p className="main__message main__message--error">{error}</p>}
+
       {!loading && pets.length === 0 && (
         <p className="main__message">No pets found. Try adjusting your filters.</p>
       )}
