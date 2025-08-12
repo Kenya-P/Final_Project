@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import Main from '../Main';
-import Profile from '../Profile';
-import Header from '../Header';
-import LoginModal from '../LoginModal';
-import RegisterModal from '../RegisterModal/RegisterModal';
-import { logIn, registerUser } from '../../utils/api';
+import Main from '../Main/Main.jsx';
+import Profile from '../Profile/Profile.jsx';
+import Header from '../Header/Header.jsx';
+import LoginModal from '../LoginModal/LoginModal.jsx';
+import RegisterModal from '../RegisterModal/RegisterModal.jsx';
+import { logIn, registerUser } from '../../../utils/PetFinderApi.js';
 import './App.css';
 
 import ProtectedRoute from '../../contexts/ProtectedRoute';
