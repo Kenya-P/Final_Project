@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ModalWithForm from '../ModalWithForm/ModalWithForm';
+import PropTypes from 'prop-types';
 import './LoginModal.css';
 
 function LoginModal({ isOpen, onClose, onLogin }) {
@@ -44,5 +45,11 @@ function LoginModal({ isOpen, onClose, onLogin }) {
     </ModalWithForm>
   );
 }
+
+LoginModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onLogin: PropTypes.func.isRequired,
+};
 
 export default LoginModal;

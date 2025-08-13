@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Main from '../Main/Main.jsx';
@@ -7,6 +7,7 @@ import Header from '../Header/Header.jsx';
 import LoginModal from '../LoginModal/LoginModal.jsx';
 import RegisterModal from '../RegisterModal/RegisterModal.jsx';
 import { logIn, registerUser } from '../../../utils/PetFinderApi.js';
+import usePetSearch from '../../hooks/usePetSearch.js';
 import './App.css';
 
 import ProtectedRoute from '../../contexts/ProtectedRoute';
@@ -17,6 +18,15 @@ function App() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
   const [loginError, setLoginError] = useState('');
+
+  // Search state
+  const petApi = usePetSearch({ sort: 'recent', limit: 20 });
+  const { loadPets } = petApi;
+
+  // initial load once
+  useEffect(() => {
+    loadPets();
+  }, [loadPets]);
 
   function handleLogin(credentials) {
     logIn(credentials)
@@ -51,7 +61,7 @@ function App() {
       <Router>
         <Header />
         <Routes>
-          <Route path="/" element={<Main />} />
+          <Route path="/" element={<Main {...petApi} />} />
           <Route
             path="/profile"
             element={

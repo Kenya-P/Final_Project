@@ -1,4 +1,5 @@
 @import url(./vendor/normalize.css);
+@import url(./vendor/fonts.css);
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -13,7 +14,17 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --font-sans: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-serif: "Noto Serif", Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: "Roboto", "Ubuntu Mono", "Courier New", monospace;
+  --bg: #fff;
+  --fg: #111;
 }
+
+/* Base */
+html { font-family: var(--font-sans); background: var(--bg); color: var(--fg); }
+h1, h2, h3 { font-family: var(--font-serif); font-weight: 700; }
 
 a {
   font-weight: 500;

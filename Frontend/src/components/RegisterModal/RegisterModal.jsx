@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ModalWithForm from '../ModalWithForm/ModalWithForm';
+import PropTypes from 'prop-types';
 import './RegisterModal.css';
 
 function RegisterModal({ isOpen, onClose, onRegister }) {
@@ -55,5 +56,12 @@ function RegisterModal({ isOpen, onClose, onRegister }) {
     </ModalWithForm>
   );
 }
+
+RegisterModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onRegister: PropTypes.func.isRequired,
+};
+
 
 export default RegisterModal;

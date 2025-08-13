@@ -1,24 +1,18 @@
-import React, { useEffect } from 'react';
-import usePetSearch from '../../hooks/usePetSearch';
 import PetCard from '../PetCard/PetCard';
 import Preloader from '../Preloader/Preloader';
+import PropTypes from 'prop-types';
 import './Main.css';
 
-function Main() {
-  const {
-    // data
-    types, animals, pagination, genderOptions, sizeOptions, ageOptions,
-    // selections
-    selectedType, gender, size, age,
-    // ui
-    loading, error, canPrev, canNext,
-    // actions
-    loadPets, onTypeChange, onGenderChange, onSizeChange, onAgeChange, clearFilters,
-  } = usePetSearch({ sort: 'recent', limit: 20 });
-
-  // initial load
-  useEffect(() => { loadPets(); }, [loadPets]);
-
+export default function Main({
+  // data
+  types, animals, pagination, genderOptions, sizeOptions, ageOptions,
+  // selections
+  selectedType, gender, size, age,
+  // ui
+  loading, error, canPrev, canNext,
+  // actions
+  loadPets, onTypeChange, onGenderChange, onSizeChange, onAgeChange, clearFilters,
+}) {
   return (
     <section className="main">
       <h2 className="main__title">Find your perfect pet</h2>
@@ -132,4 +126,60 @@ function Main() {
   );
 }
 
-export default Main;
+Main.propTypes = {
+  // data
+  types: PropTypes.arrayOf(PropTypes.shape({ name: PropTypes.string.isRequired })).isRequired,
+  animals: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+      breeds: PropTypes.shape({ primary: PropTypes.string }),
+      age: PropTypes.string,
+      photos: PropTypes.arrayOf(
+        PropTypes.shape({
+          small: PropTypes.string,
+          medium: PropTypes.string,
+          large: PropTypes.string,
+          full: PropTypes.string,
+        })
+      ),
+      url: PropTypes.string,
+    })
+  ).isRequired,
+  pagination: PropTypes.shape({
+    count_per_page: PropTypes.number,
+    total_count: PropTypes.number,
+    current_page: PropTypes.number,
+    total_pages: PropTypes.number,
+  }).isRequired,
+
+  // options
+  genderOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  sizeOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  ageOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+
+  // selections
+  selectedType: PropTypes.string.isRequired,
+  gender: PropTypes.string.isRequired,
+  size: PropTypes.string.isRequired,
+  age: PropTypes.string.isRequired,
+
+  // ui
+  loading: PropTypes.bool.isRequired,
+  error: PropTypes.string,
+  canPrev: PropTypes.bool.isRequired,
+  canNext: PropTypes.bool.isRequired,
+
+  // actions
+  loadPets: PropTypes.func.isRequired,
+  onTypeChange: PropTypes.func.isRequired,
+  onGenderChange: PropTypes.func.isRequired,
+  onSizeChange: PropTypes.func.isRequired,
+  onAgeChange: PropTypes.func.isRequired,
+  clearFilters: PropTypes.func.isRequired,
+};
+
+Main.defaultProps = {
+  error: '',
+};
+
