@@ -1,0 +1,20 @@
+.footer {
+   height: 20px;
+  top: 1040px;
+  left: 40px;
+  margin-top: 24px;
+  color: #000;
+}
+
+.footer__copyright {
+  margin: 0;
+}
+
+.footer p {
+  display: flex;
+  
+}
+
+.footer span {
+  margin-left: auto;
+}

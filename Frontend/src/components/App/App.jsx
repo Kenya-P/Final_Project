@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Main from '../Main/Main.jsx';
@@ -6,27 +6,30 @@ import Profile from '../Profile/Profile.jsx';
 import Header from '../Header/Header.jsx';
 import LoginModal from '../LoginModal/LoginModal.jsx';
 import RegisterModal from '../RegisterModal/RegisterModal.jsx';
-import { logIn, registerUser } from '../../../utils/PetFinderApi.js';
+import { logIn, registerUser, logOut } from '../../../utils/auth.js';
 import usePetSearch from '../../hooks/usePetSearch.js';
 import './App.css';
 
-import ProtectedRoute from '../../contexts/ProtectedRoute';
-import CurrentUserContext from '../../contexts/CurrentUserContext';
+import ProtectedRoute from '../../contexts/ProtectedRoute.jsx';
+import CurrentUserContext from '../../contexts/CurrentUserContext.jsx';
 
-function App() {
+export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
   const [loginError, setLoginError] = useState('');
 
-  // Search state
+  // search state lives here (rubric-friendly)
   const petApi = usePetSearch({ sort: 'recent', limit: 20 });
-  const { loadPets } = petApi;
+  const { loadPets, loadSavedPets } = petApi;
 
-  // initial load once
+  // initial data
+  useEffect(() => { loadPets(); }, [loadPets]);
+
+  // refresh saved list after login/logout
   useEffect(() => {
-    loadPets();
-  }, [loadPets]);
+    if (currentUser?.id) loadSavedPets();
+  }, [currentUser, loadSavedPets]);
 
   function handleLogin(credentials) {
     logIn(credentials)
@@ -47,26 +50,38 @@ function App() {
         if (res.user) {
           setIsRegisterOpen(false);
           setCurrentUser(res.user);
-        } else {
-          console.error('Registration failed:', res.message || 'Unknown error');
         }
       })
-      .catch((err) => {
-        console.error('Registration error:', err);
-      });
+      .catch((err) => console.error('Registration error:', err));
+  }
+
+  function handleLogout() {
+    logOut().finally(() => {
+      setCurrentUser({});
+    });
   }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <Router>
-        <Header />
+        <Header
+          onOpenLogin={() => setIsLoginOpen(true)}
+          onOpenRegister={() => setIsRegisterOpen(true)}
+          onLogout={handleLogout}
+        />
+
         <Routes>
           <Route path="/" element={<Main {...petApi} />} />
           <Route
             path="/profile"
             element={
-              <ProtectedRoute element={Profile} isLoggedIn={!!currentUser} />
-            }
+            <ProtectedRoute element={(props) => 
+            <Profile {...props} 
+            savedPets={petApi.savedPets} 
+            loadSavedPets={petApi.loadSavedPets} 
+            toggleLike={petApi.toggleLike} />} 
+            isLoggedIn={!!currentUser?.id} />
+          }
           />
         </Routes>
 
@@ -87,5 +102,3 @@ function App() {
     </CurrentUserContext.Provider>
   );
 }
-
-export default App;
