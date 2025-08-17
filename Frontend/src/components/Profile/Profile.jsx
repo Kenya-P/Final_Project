@@ -4,7 +4,12 @@ import PetCard from '../PetCard/PetCard';
 import { removePet } from '../../../utils/PetFinderApi';
 import './Profile.css';
 
-export default function Profile({ savedPets, loadSavedPets, toggleLike }) {
+export default function Profile({
+  savedPets = [],
+  loadSavedPets = () => {},
+  toggleLike = () => {},
+  onAuthRequired = () => {},
+}) {
   useEffect(() => { loadSavedPets(); }, [loadSavedPets]);
 
   const onRemove = async (pet) => {
@@ -42,4 +47,5 @@ Profile.propTypes = {
   savedPets: PropTypes.array.isRequired,
   loadSavedPets: PropTypes.func.isRequired,
   toggleLike: PropTypes.func.isRequired,
+  onAuthRequired: PropTypes.func.isRequired,
 };

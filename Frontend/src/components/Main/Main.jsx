@@ -5,16 +5,44 @@ import { Link } from 'react-router-dom';
 import './Main.css';
 
 export default function Main({
-  // data
-  types, animals, savedPets, pagination, genderOptions, sizeOptions, ageOptions,
+  // data (provide safe fallbacks)
+  types = [],
+  animals = [],
+  savedPets = [],
+  pagination = { count_per_page: 20, total_count: 0, current_page: 1, total_pages: 1 },
+  genderOptions = ['Male', 'Female', 'Unknown'],
+  sizeOptions = ['Small', 'Medium', 'Large', 'X-Large'],
+  ageOptions = ['Baby', 'Young', 'Adult', 'Senior'],
+
   // selections
-  selectedType, gender, size, age, city, state, q,
+  selectedType = '',
+  gender = '',
+  size = '',
+  age = '',
+  city = '',
+  state = '',
+  q = '',
+
   // ui
-  loading, error, canPrev, canNext,
-  // actions
-  loadPets, loadSavedPets, toggleLike, isPetSaved,
-  onTypeChange, onGenderChange, onSizeChange, onAgeChange,
-  onCityChange, onStateChange, onQueryChange, clearFilters,
+  loading = false,
+  error = '',
+  canPrev = false,
+  canNext = false,
+
+  // actions (no-ops by default)
+  loadPets = () => {},
+  loadSavedPets = () => {},
+  toggleLike = () => {},
+  isPetSaved = () => false,
+  onTypeChange = () => {},
+  onGenderChange = () => {},
+  onSizeChange = () => {},
+  onAgeChange = () => {},
+  onCityChange = () => {},
+  onStateChange = () => {},
+  onQueryChange = () => {},
+  clearFilters = () => {},
+  onAuthRequired = () => {},
 }) {
   const savedIds = new Set(savedPets.map((p) => String(p.id)));
 
@@ -190,5 +218,4 @@ Main.propTypes = {
   onQueryChange: PropTypes.func.isRequired,
   clearFilters: PropTypes.func.isRequired,
 };
-Main.defaultProps = { error: '' };
 

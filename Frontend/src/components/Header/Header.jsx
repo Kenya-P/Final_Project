@@ -6,7 +6,11 @@ import CurrentUserContext from '../../contexts/CurrentUserContext.jsx';
 import logoUrl from '../../assets/images/logo.svg';
 import './Header.css';
 
-export default function Header({ onOpenLogin, onOpenRegister, onLogout }) {
+export default function Header({
+  onOpenLogin,
+  onLogout,
+  onOpenRegister = () => {},
+}) {
   const user = useContext(CurrentUserContext);
   const isLoggedIn = Boolean(user?.id);
 

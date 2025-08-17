@@ -1,7 +1,15 @@
 import PropTypes from 'prop-types';
+import likeBtnUrl from '../../assets/images/card-like.svg';
 import './PetCard.css';
 
-export default function PetCard({ pet, isSaved, onToggleSave, variant = 'default', showRemove = false, onRemove }) {
+export default function PetCard({
+  pet,
+  isSaved = false,
+  onToggleSave = () => {},
+  variant = 'default',
+  showRemove = false,
+  onRemove = () => {},
+}) {
   const { name, breeds, age, photos, url } = pet;
   const img = photos?.[0]?.medium || photos?.[0]?.small || 'https://via.placeholder.com/300x200?text=Pet';
   const breed = breeds?.primary || 'Unknown breed';
@@ -26,7 +34,7 @@ export default function PetCard({ pet, isSaved, onToggleSave, variant = 'default
           aria-label={isSaved ? 'Unsave pet' : 'Save pet'}
           title={isSaved ? 'Unsave' : 'Save'}
         >
-          ♥
+          <img src={ likeBtnUrl } alt="like-btn" className="pet-card_like" />
         </button>
 
         {showRemove && (
@@ -56,4 +64,3 @@ PetCard.propTypes = {
   showRemove: PropTypes.bool,
   onRemove: PropTypes.func,
 };
-PetCard.defaultProps = { isSaved: false, onToggleSave: () => {}, variant: 'default', showRemove: false, onRemove: () => {} };

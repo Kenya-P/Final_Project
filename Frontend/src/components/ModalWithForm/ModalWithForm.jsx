@@ -2,7 +2,17 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './ModalWithForm.css';
 
-function ModalWithForm({ isOpen, onClose, children, title }) {
+export default function ModalWithForm({
+  isOpen = false,
+  title = '',
+  children = null,
+  onClose = () => {},
+  onSubmit = () => {},
+  submitLabel = 'Save',
+  disabled = false,
+}) {
+  if (!isOpen) return null;
+  
   // Close on ESC
   useEffect(() => {
     const handleEsc = (e) => {
@@ -41,10 +51,3 @@ ModalWithForm.propTypes = {
   children: PropTypes.node,
   onSubmit: PropTypes.func,
 };
-
-ModalWithForm.defaultProps = {
-  children: null,
-  onSubmit: undefined,
-};
-
-export default ModalWithForm;
