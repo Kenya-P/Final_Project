@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Main from '../Main/Main.jsx';
 import Profile from '../Profile/Profile.jsx';
 import Header from '../Header/Header.jsx';
+import Footer from '../Footer/Footer.jsx';
 import LoginModal from '../LoginModal/LoginModal.jsx';
 import RegisterModal from '../RegisterModal/RegisterModal.jsx';
 import { logIn, registerUser, logOut } from '../../../utils/auth.js';
@@ -84,19 +85,21 @@ export default function App() {
           }
           />
         </Routes>
+          <Footer />
 
-        <LoginModal
-          isOpen={isLoginOpen}
-          onClose={() => setIsLoginOpen(false)}
-          onLogin={handleLogin}
-        />
+          <div>
+            <LoginModal
+              isOpen={isLoginOpen}
+              onClose={() => setIsLoginOpen(false)}
+              onLogin={handleLogin}
+            />
 
-        <RegisterModal
-          isOpen={isRegisterOpen}
-          onClose={() => setIsRegisterOpen(false)}
-          onRegister={handleRegister}
-        />
-
+            <RegisterModal
+              isOpen={isRegisterOpen}
+              onClose={() => setIsRegisterOpen(false)}
+              onRegister={handleRegister}
+            />
+          </div>
         {loginError && <p className="error">{loginError}</p>}
       </Router>
     </CurrentUserContext.Provider>
