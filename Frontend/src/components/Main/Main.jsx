@@ -1,186 +1,169 @@
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import PetCard from '../PetCard/PetCard';
 import Preloader from '../Preloader/Preloader';
-import { Link } from 'react-router-dom';
+import FiltersPanel from '../FlitersPanel/FiltersPanel.jsx';
 import './Main.css';
 
-export default function Main({
-  // data (provide safe fallbacks)
-  types = [],
-  animals = [],
-  savedPets = [],
-  pagination = { count_per_page: 20, total_count: 0, current_page: 1, total_pages: 1 },
-  genderOptions = ['Male', 'Female', 'Unknown'],
-  sizeOptions = ['Small', 'Medium', 'Large', 'X-Large'],
-  ageOptions = ['Baby', 'Young', 'Adult', 'Senior'],
+export default function Main(props) {
+  const {
+    // data
+    types, animals, savedPets, pagination, genderOptions, sizeOptions, ageOptions,
+    // selections
+    selectedType, gender, size, age, city, state, q,
+    // ui
+    loading, error, canPrev, canNext,
+    // actions
+    loadPets, loadSavedPets, toggleLike, isPetSaved,
+    onTypeChange, onGenderChange, onSizeChange, onAgeChange,
+    onCityChange, onStateChange, onQueryChange, clearFilters,
+    onAuthRequired = () => {},
+  } = props;
 
-  // selections
-  selectedType = '',
-  gender = '',
-  size = '',
-  age = '',
-  city = '',
-  state = '',
-  q = '',
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const activeCount = useMemo(
+    () => [selectedType, gender, size, age, city, state, q].filter(Boolean).length,
+    [selectedType, gender, size, age, city, state, q]
+  );
 
-  // ui
-  loading = false,
-  error = '',
-  canPrev = false,
-  canNext = false,
-
-  // actions (no-ops by default)
-  loadPets = () => {},
-  loadSavedPets = () => {},
-  toggleLike = () => {},
-  isPetSaved = () => false,
-  onTypeChange = () => {},
-  onGenderChange = () => {},
-  onSizeChange = () => {},
-  onAgeChange = () => {},
-  onCityChange = () => {},
-  onStateChange = () => {},
-  onQueryChange = () => {},
-  clearFilters = () => {},
-  onAuthRequired = () => {},
-}) {
-  const savedIds = new Set(savedPets.map((p) => String(p.id)));
+  const handleToggle = (pet) =>
+    toggleLike(pet).catch((e) => {
+      if (e?.status === 401) onAuthRequired();
+    });
 
   return (
     <section className="main">
-      <h2 className="main__title">Find your perfect pet companion.</h2>
+      <h1 className="main__title">Find your perfect pet companion.</h1>
 
-      {/* Filters */}
-      <div className="main__controls">
-        <div className="main__control">
-          <label className="main__label" htmlFor="q">Search</label>
-          <input
-            id="q"
-            className="main__select"
-            type="search"
-            value={q}
-            onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="Name, breed, type…"
+      <div className="main__layout">
+        {/* Desktop sidebar */}
+        <aside className="main__sidebar">
+          <FiltersPanel
+            types={types}
+            genderOptions={genderOptions}
+            sizeOptions={sizeOptions}
+            ageOptions={ageOptions}
+            selectedType={selectedType}
+            gender={gender}
+            size={size}
+            age={age}
+            city={city}
+            state={state}
+            q={q}
+            loading={loading}
+            onTypeChange={onTypeChange}
+            onGenderChange={onGenderChange}
+            onSizeChange={onSizeChange}
+            onAgeChange={onAgeChange}
+            onCityChange={onCityChange}
+            onStateChange={onStateChange}
+            onQueryChange={onQueryChange}
+            clearFilters={clearFilters}
           />
-        </div>
+        </aside>
 
-        <div className="main__control">
-          <label className="main__label" htmlFor="type">Type</label>
-          <select id="type" className="main__select"
-                  value={selectedType} onChange={(e) => onTypeChange(e.target.value)}>
-            <option value="">All</option>
-            {types.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
-          </select>
-        </div>
+        {/* Content area */}
+        <div className="main__content">
+          {/* Mobile dropdown trigger */}
+          <div className="main__filters-mobile">
+            <details
+              className="filters-drop"
+              open={mobileOpen}
+              onToggle={(e) => setMobileOpen(e.currentTarget.open)}
+            >
+              <summary className="filters-drop__summary">
+                Filters{activeCount ? ` (${activeCount})` : ''}
+              </summary>
 
-        <div className="main__control">
-          <label className="main__label" htmlFor="gender">Gender</label>
-          <select id="gender" className="main__select"
-                  value={gender} onChange={(e) => onGenderChange(e.target.value)}>
-            <option value="">Any</option>
-            {genderOptions.map((g) => <option key={g} value={g}>{g}</option>)}
-          </select>
-        </div>
-
-        <div className="main__control">
-          <label className="main__label" htmlFor="size">Size</label>
-          <select id="size" className="main__select"
-                  value={size} onChange={(e) => onSizeChange(e.target.value)}>
-            <option value="">Any</option>
-            {sizeOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-
-        <div className="main__control">
-          <label className="main__label" htmlFor="age">Age</label>
-          <select id="age" className="main__select"
-                  value={age} onChange={(e) => onAgeChange(e.target.value)}>
-            <option value="">Any</option>
-            {ageOptions.map((a) => <option key={a} value={a}>{a}</option>)}
-          </select>
-        </div>
-
-        <div className="main__control">
-          <label className="main__label" htmlFor="city">City</label>
-          <input id="city" className="main__select" type="text"
-                 value={city} onChange={(e) => onCityChange(e.target.value)}
-                 placeholder="e.g., Jersey City" />
-        </div>
-
-        <div className="main__control">
-          <label className="main__label" htmlFor="state">State</label>
-          <input id="state" className="main__select" type="text"
-                 value={state} onChange={(e) => onStateChange(e.target.value)}
-                 placeholder="e.g., NJ" />
-        </div>
-
-        <button
-          className="main__btn main__btn--ghost"
-          onClick={clearFilters}
-          disabled={loading || (!selectedType && !gender && !size && !age && !city && !state && !q)}
-        >
-          Clear filters
-        </button>
-      </div>
-
-      {/* Pagination */}
-      <div className="main__pager">
-        <button className="main__btn" disabled={!canPrev || loading}
-                onClick={() => loadPets({ page: pagination.current_page - 1 })}>
-          Prev
-        </button>
-        <span className="main__page">Page {pagination.current_page || 1} / {pagination.total_pages || 1}</span>
-        <button className="main__btn" disabled={!canNext || loading}
-                onClick={() => loadPets({ page: pagination.current_page + 1 })}>
-          Next
-        </button>
-      </div>
-
-      {loading && <Preloader />}
-
-      {error && <p className="main__message main__message--error">{error}</p>}
-
-      {!loading && animals.length === 0 && !error && (
-        <p className="main__message">No pets found. Try adjusting your filters.</p>
-      )}
-
-      {/* Available pets */}
-      <div className="main__grid">
-        {animals.map((pet) => (
-          <PetCard
-            key={pet.id}
-            pet={pet}
-            isSaved={savedIds.has(String(pet.id))}
-            onToggleSave={() => toggleLike(pet)}
-          />
-        ))}
-      </div>
-
-      {/* Short list of saved pets */}
-      <div className="main__saved">
-        <div className="main__saved-head">
-          <h3 className="main__subtitle">Saved Pets</h3>
-          <div className="main__saved-actions">
-            <button className="main__btn" onClick={loadSavedPets}>Refresh</button>
-            <Link to="/profile" className="main__btn">View all</Link>
+              <div className="filters-drop__content">
+                <FiltersPanel
+                  types={types}
+                  genderOptions={genderOptions}
+                  sizeOptions={sizeOptions}
+                  ageOptions={ageOptions}
+                  selectedType={selectedType}
+                  gender={gender}
+                  size={size}
+                  age={age}
+                  city={city}
+                  state={state}
+                  q={q}
+                  loading={loading}
+                  onTypeChange={onTypeChange}
+                  onGenderChange={onGenderChange}
+                  onSizeChange={onSizeChange}
+                  onAgeChange={onAgeChange}
+                  onCityChange={onCityChange}
+                  onStateChange={onStateChange}
+                  onQueryChange={onQueryChange}
+                  clearFilters={clearFilters}
+                  onClose={() => setMobileOpen(false)}
+                />
+              </div>
+            </details>
           </div>
-        </div>
 
-        {savedPets.length === 0 ? (
-          <p className="main__message">You haven’t saved any pets yet.</p>
-        ) : (
-          <div className="main__grid main__grid--saved">
-            {savedPets.slice(0, 3).map((pet) => (
+          {/* Pager */}
+          <div className="main__pager">
+            <button className="main__btn" disabled={!canPrev || loading}
+                    onClick={() => loadPets({ page: pagination.current_page - 1 })}>
+              Prev
+            </button>
+            <span className="main__page">
+              Page {pagination.current_page || 1} / {pagination.total_pages || 1}
+            </span>
+            <button className="main__btn" disabled={!canNext || loading}
+                    onClick={() => loadPets({ page: pagination.current_page + 1 })}>
+              Next
+            </button>
+          </div>
+
+          {loading && <Preloader />}
+          {error && <p className="main__message main__message--error">{error}</p>}
+          {!loading && animals.length === 0 && !error && (
+            <p className="main__message">No pets found. Try adjusting your filters.</p>
+          )}
+
+          {/* Available pets */}
+          <div className="main__grid">
+            {animals.map((pet) => (
               <PetCard
-                key={`saved-${pet.id}`}
+                key={pet.id}
                 pet={pet}
-                isSaved
-                onToggleSave={() => toggleLike(pet)}
-                variant="compact"
+                isSaved={isPetSaved(pet.id)}
+                onToggleSave={() => handleToggle(pet)}
               />
             ))}
           </div>
-        )}
+
+          {/* Saved summary (top 3) */}
+          <div className="main__saved">
+            <div className="main__saved-head">
+              <h2 className="main__subtitle">Saved Pets</h2>
+              <div className="main__saved-actions">
+                <button className="main__btn" onClick={loadSavedPets}>Refresh</button>
+                <Link to="/profile" className="main__btn">View all</Link>
+              </div>
+            </div>
+
+            {savedPets.length === 0 ? (
+              <p className="main__message">You haven’t saved any pets yet.</p>
+            ) : (
+              <div className="main__grid main__grid--saved">
+                {savedPets.slice(0, 3).map((pet) => (
+                  <PetCard
+                    key={`saved-${pet.id}`}
+                    pet={pet}
+                    isSaved
+                    onToggleSave={() => handleToggle(pet)}
+                    variant="compact"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -217,5 +200,5 @@ Main.propTypes = {
   onStateChange: PropTypes.func.isRequired,
   onQueryChange: PropTypes.func.isRequired,
   clearFilters: PropTypes.func.isRequired,
+  onAuthRequired: PropTypes.func,
 };
-

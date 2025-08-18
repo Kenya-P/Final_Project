@@ -1,5 +1,6 @@
+import { useContext } from 'react';
+import CurrentUserContext from '../../contexts/CurrentUserContext.jsx';
 import PropTypes from 'prop-types';
-import likeBtnUrl from '../../assets/images/card-like.svg';
 import './PetCard.css';
 
 export default function PetCard({
@@ -9,10 +10,22 @@ export default function PetCard({
   variant = 'default',
   showRemove = false,
   onRemove = () => {},
+  onAuthRequired = () => {},
 }) {
   const { name, breeds, age, photos, url } = pet;
   const img = photos?.[0]?.medium || photos?.[0]?.small || 'https://via.placeholder.com/300x200?text=Pet';
   const breed = breeds?.primary || 'Unknown breed';
+  const currentUser = useContext(CurrentUserContext);
+
+  const isLiked = isSaved || (currentUser && currentUser.savedPets?.some((p) => p.id === pet.id));
+
+
+  const handleLikeClick = () => {
+    if (!currentUser || !currentUser.id) {
+      return;
+    }
+    onToggleSave(pet);
+  };
 
   return (
     <article className={`pet-card pet-card--${variant}`}>
@@ -27,15 +40,13 @@ export default function PetCard({
       </div>
 
       <div className="pet-card__actions">
-        <button
-          className={`pet-card__save ${isSaved ? 'pet-card__save--on' : ''}`}
-          onClick={onToggleSave}
-          aria-pressed={isSaved}
-          aria-label={isSaved ? 'Unsave pet' : 'Save pet'}
-          title={isSaved ? 'Unsave' : 'Save'}
-        >
-          <img src={ likeBtnUrl } alt="like-btn" className="pet-card_like" />
-        </button>
+        {currentUser && currentUser._id && (
+          <button
+            type="button"
+            className={`card__like-button ${isLiked ? 'card__like-button_active' : ''}`}
+            onClick={handleLikeClick}
+          ></button>
+        )}
 
         {showRemove && (
           <button className="pet-card__remove" onClick={onRemove} aria-label="Remove from saved">
@@ -48,19 +59,9 @@ export default function PetCard({
 }
 
 PetCard.propTypes = {
-  pet: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    name: PropTypes.string.isRequired,
-    url: PropTypes.string,
-    age: PropTypes.string,
-    breeds: PropTypes.shape({ primary: PropTypes.string }),
-    photos: PropTypes.arrayOf(PropTypes.shape({
-      small: PropTypes.string, medium: PropTypes.string, large: PropTypes.string, full: PropTypes.string
-    })),
-  }).isRequired,
+  pet: PropTypes.object.isRequired,
   isSaved: PropTypes.bool,
   onToggleSave: PropTypes.func,
-  variant: PropTypes.oneOf(['default', 'compact']),
-  showRemove: PropTypes.bool,
-  onRemove: PropTypes.func,
+  onAuthRequired: PropTypes.func,
 };
+

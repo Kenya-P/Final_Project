@@ -1,123 +1,104 @@
+/* Overall page width remains the same */
 .main { 
   padding: 24px 16px; 
-  max-width: 1100px; 
-  margin: 0 auto;
+  max-width: 1200px; 
+  margin: 0 auto; 
   position: relative; 
 }
-
 .main__title { 
   margin: 0 0 18px; 
-  text-align: center;
-  font-size: 1.75rem; 
-  line-height: 1.2;
+  text-align: center; 
+  font-size: 2rem; 
+  line-height: 1.2; 
 }
 
-.main__controls {
+/* Two-column layout on desktop: sidebar + content */
+.main__layout {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: 12px; 
-  align-items: end; 
-  margin-bottom: 16px;
+  gap: 20px;
+  align-items: start;
 }
 
-.main__control { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 6px;
+/* Sidebar only visible ≥1024px */
+.main__sidebar { display: none; }
+@media (min-width: 1024px) {
+  .main__sidebar { display: block; }
 }
 
-.main__label { 
-  font-size: .9rem; 
-  color: #444;
+/* Mobile dropdown trigger lives in content area; hide it on desktop */
+.main__filters-mobile { margin-bottom: 10px; }
+@media (min-width: 1024px) {
+  .main__filters-mobile { display: none; }
 }
 
-.main__select { 
-  height: 36px; 
-  border: 1px solid #d6d6d6; 
-  border-radius: 10px; 
-  padding: 0 10px; 
+/* Details-based dropdown styles */
+.filters-drop {
+  display: inline-block;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
   background: #fff;
+  overflow: hidden;
+}
+.filters-drop__summary {
+  list-style: none; 
+  cursor: pointer;
+  padding: 10px 14px; 
+  font-weight: 600;
+}
+.filters-drop__summary::marker,
+.filters-drop summary::-webkit-details-marker { 
+  display: none; 
+}
+.filters-drop__content { 
+  padding: 10px 14px 14px; 
+  border-top: 1px solid #eee; 
 }
 
+/* Keep your existing grid for cards */
+.main__grid { 
+  display: grid; 
+  grid-template-columns: repeat(3, minmax(0, 1fr)); 
+  gap: 16px; 
+}
+.main__grid--saved { 
+  grid-template-columns: repeat(3, minmax(0, 1fr)); 
+}
+
+@media (max-width: 900px) {
+  .main__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .main__grid--saved { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .main__grid, .main__grid--saved { grid-template-columns: 1fr; }
+}
+
+/* Pager, messages, buttons retained from earlier */
+.main__pager { 
+  display: flex; 
+  justify-content: center; 
+  gap: 10px; 
+  margin: 8px 0 16px; 
+}
 .main__btn { 
-  height: 36px; 
+  height: 30px;
   padding: 0 14px; 
   border-radius: 10px; 
   border: 1px solid #d6d6d6; 
   background: #f7f7f7; 
-  cursor: pointer;
+  cursor: pointer; 
 }
+.main__btn:hover { background: #efefef; }
+.main__btn--ghost { background: transparent; }
+.main__page { font-size: .95rem; color: #333; }
+.main__message { margin: 16px 0; color: #333; }
+.main__message--error { color: #b00020; }
 
-.main__btn:hover { 
-  background: #efefef;
-}
-
-.main__btn--ghost { 
-  background: transparent;
-}
-
-.main__pager { 
-  display: flex; 
-  align-items: center; 
-  gap: 10px; 
-  margin: 8px 0 16px;
-}
-
-.main__page { 
-  font-size: .95rem; 
-  color: #333;
-}
-
-.main__message { 
-  margin: 16px 0; 
-  color: #333;
-}
-
-.main__message--error { 
-  color: #b00020;
-}
-
-.main__grid { 
-  display: grid; 
-  grid-template-columns: repeat(4, minmax(0, 1fr)); 
-  gap: 16px;
-}
-
-.main__grid--saved { 
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.main__saved { 
-  margin-top: 24px; 
-}
-
-.main__subtitle { 
-  margin: 0 0 10px; 
-  font-size: 1.25rem;
-}
-
+.main__saved { margin-top: 24px; }
 .main__saved-head { 
   display: flex; 
   align-items: center; 
   justify-content: space-between; 
-  gap: 12px;
+  gap: 12px; 
 }
-
-.main__saved-actions { 
-  display: inline-flex; 
-  gap: 8px;
-}
-
-@media (max-width: 1024px) {
-  .main__controls { grid-template-columns: repeat(3, 1fr); }
-  .main__grid { grid-template-columns: repeat(3, 1fr); }
-  .main__grid--saved { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 768px) {
-  .main__controls { grid-template-columns: repeat(2, 1fr); }
-  .main__grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 480px) {
-  .main__controls { grid-template-columns: 1fr; }
-  .main__grid, .main__grid--saved { grid-template-columns: 1fr; }
-}
+.main__subtitle { margin: 0; font-size: 1.25rem; }
+.main__saved-actions { display: inline-flex; gap: 8px; }

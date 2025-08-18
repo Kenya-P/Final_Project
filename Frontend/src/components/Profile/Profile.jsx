@@ -35,6 +35,7 @@ export default function Profile({
               onToggleSave={() => toggleLike(pet)}
               showRemove
               onRemove={() => onRemove(pet)}
+              onAuthRequired={() => setIsLoginOpen(true)}
             />
           ))}
         </div>

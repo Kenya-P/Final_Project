@@ -2,6 +2,7 @@
 .header {
   position: sticky;
   top: 0;
+  gap: 12px;
   z-index: 1000;
   background: #fff;
   border-bottom: 1px solid #eee;
@@ -48,8 +49,9 @@
   text-decoration: underline; 
 }
 
-/* Actions (right) */
-.header__auth { justify-self: end; }
+.header__auth { 
+  justify-self: end; 
+}
 
 .header__btn {
   height: 38px;
@@ -94,9 +96,6 @@
 }
 
 @media (max-width: 720px) {
-  .header {
-    grid-template-columns: auto 1fr auto; /* keep nav centered but allow shrink */
-  }
   .header__nav { gap: 20px; }
 }
 
