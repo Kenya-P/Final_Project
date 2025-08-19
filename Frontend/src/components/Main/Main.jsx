@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { getPets } from '../../../utils/PetFinderApi.jsx';
 import PetCard from '../PetCard/PetCard';
 import Preloader from '../Preloader/Preloader';
 import FiltersPanel from '../FlitersPanel/FiltersPanel.jsx';
@@ -13,7 +14,7 @@ export default function Main(props) {
     // selections
     selectedType, gender, size, age, city, state, q,
     // ui
-    loading, error, canPrev, canNext,
+    error, canPrev, canNext,
     // actions
     loadPets, loadSavedPets, toggleLike, isPetSaved,
     onTypeChange, onGenderChange, onSizeChange, onAgeChange,
@@ -26,6 +27,24 @@ export default function Main(props) {
     () => [selectedType, gender, size, age, city, state, q].filter(Boolean).length,
     [selectedType, gender, size, age, city, state, q]
   );
+
+  const [pets, setPets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await getPets({ type: 'Dog', location: 'New York, NY' });
+        setPets(list);
+      } catch (e) {
+        setErr('Could not load live data.');
+        // setPets(fallback); // optional: fallback to mock
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const handleToggle = (pet) =>
     toggleLike(pet).catch((e) => {
