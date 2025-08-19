@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useMemo, useState, useEffect } from 'react';
-import { getPets } from '../../../utils/PetFinderApi.jsx';
+import { getPets } from '../../../utils/PetFinderApi';
 import PetCard from '../PetCard/PetCard';
 import Preloader from '../Preloader/Preloader';
 import FiltersPanel from '../FlitersPanel/FiltersPanel.jsx';

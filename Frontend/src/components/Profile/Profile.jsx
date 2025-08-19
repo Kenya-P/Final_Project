@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import PetCard from '../PetCard/PetCard';
-import { removePet } from '../../../utils/PetFinderApi';
+//import { removePet } from '../../../utils/PetFinderApi';
 import './Profile.css';
 
 export default function Profile({
