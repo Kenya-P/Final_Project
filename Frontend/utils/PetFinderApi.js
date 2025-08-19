@@ -1,7 +1,7 @@
 import { getCurrentUserId } from './auth';
 import localDataset from '../src/mocks/animal.json';
 
-export const BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'http://localhost:3001';
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 const MOCK_DATA_URL = import.meta?.env?.VITE_MOCK_DATA_URL || '/mocks/animals.json';
 const delay = (ms = 250) => new Promise(res => setTimeout(res, ms));
 
@@ -35,22 +35,18 @@ const saveUserHidden= (uid, a) => writeJSON(hideKey(uid), a);
 
 // ---- pets ----
 export async function getPets(params = {}) {
-  await delay();
-  const data = await loadDataset();
-  const {
-    page = 1, limit = 20,
-    type, gender, size, age, status,
-    city, state, q, sort
-  } = params;
-
-  let animals = [...(data.animals || [])];
-
-  // hide removed
-  const uid = getCurrentUserId();
-  if (uid) {
-    const hidden = new Set(getUserHidden(uid).map(String));
-    animals = animals.filter(a => !hidden.has(String(a.id)));
-  }
+  const url = new URL(`${BASE}/api/pf/animals`);
+  Object.entries(params).forEach(([k, v]) => v != null && url.searchParams.set(k, v));
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch animals');
+  const data = await res.json();
+  return (data.animals || []).map(a => ({
+    id: a.id,
+    name: a.name,
+    imageUrl: a.photos?.[0]?.medium || a.primary_photo_cropped?.medium || '',
+    url: a.url,
+  }));
+}
 
   // type sanity
   const knownTypes = new Set((data.types || []).map(t => String(t.name).toLowerCase()));
