@@ -1,28 +1,36 @@
 import { getCurrentUserId } from './auth';
 
-const API_BASE = import.meta?.env?.VITE_API_BASE || '';
+const API_BASE = '/api/pf';
 
-function _assertOk(res) {
-  if (res.ok) return res.json();
-  return res.text().then((t) => {
-    throw new Error(`API ${res.status}: ${t}`);
-  });
+async function parseProblem(res) {
+  let text = await res.text().catch(() => '');
+  try { return JSON.parse(text); } catch { return { status: res.status, title: res.statusText, detail: text }; }
+}
+
+async function assertOk(res) {
+  if (!res.ok) {
+    const prob = await parseProblem(res);
+    const err = new Error(prob.detail || prob.title || `HTTP ${res.status}`);
+    err.problem = prob;
+    throw err;
+  }
+  return res.json();
 }
 
 // ---- Petfinder passthroughs ----
 export async function getAnimalTypes() {
-  const res = await fetch(`${API_BASE}/api/pf/types`, { cache: 'no-store' });
-  const data = await _assertOk(res);
+  const url = new URL(`${API_BASE}/types`, window.location.origin);
+  const res = await fetch(url.toString().replace(window.location.origin, ''));
+  assertOk(res);
   return { types: data.types || [] };
 }
 
 export async function getPets(params = {}) {
-  const url = new URL(`${API_BASE}/api/pf/animals`, window.location.origin);
+  const url = new URL(`${API_BASE}/animals`, window.location.origin);
   Object.entries(params).forEach(([k, v]) => {
     if (v != null && String(v).trim() !== '') url.searchParams.set(k, v);
   });
   const res = await fetch(url.toString().replace(window.location.origin, ''));
-  const data = await _assertOk(res);
 
   const animals = (data.animals || []).map((a) => ({
     id: a.id,
@@ -40,6 +48,8 @@ export async function getPets(params = {}) {
     contact: a.contact,
     published_at: a.published_at
   }));
+
+  assertOk(res);
 
   return {
     animals,
