@@ -1,48 +1,47 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import useModalClose from '../../../utils/useModalClose.js';
 import './ModalWithForm.css';
 
-export default function ModalWithForm({
-  isOpen = false,
-  title = '',
-  children = null,
-  onClose = () => {},
-  onSubmit = () => {},
-  submitLabel = 'Save',
-  disabled = false,
-}) {
-  if (!isOpen) return null;
-  
-  // Close on ESC
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
-
-  // Close on outside click
-  const handleOutsideClick = (e) => {
-    if (e.target.classList.contains('modal')) {
-      onClose();
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="modal" onClick={handleOutsideClick}>
-      <div className="modal__container">
-        <button className="modal__close" onClick={onClose}>
-          ×
-        </button>
-        <h2 className="modal__title">{title}</h2>
-        {children}
-      </div>
-    </div>
-  );
+function ModalWithForm({children, buttonText, title, isOpen, onClose, name, onSubmit, secondaryButtonText, secondaryButtonLink, secondaryButtonAction, isLoading, disabled}) {
+    useModalClose(isOpen, onClose);
+    
+    return (
+        <div className={`modal ${isOpen ? "modal_opened" : ""}`}>
+            <div className="modal__content">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="modal__close"
+                />
+                <h3 className="modal__title">{title}</h3>
+                <form onSubmit={onSubmit} className="modal__form">
+                    {children}
+                    <div className="modal__button-container">
+                        <button
+                            type="submit"
+                            className="modal__submit"
+                            disabled={isLoading || disabled}
+                        >
+                            {buttonText}
+                        </button>
+                            {secondaryButtonText && secondaryButtonAction && (
+                            <button
+                                type="button"
+                                className="modal__secondary-button"
+                                onClick={secondaryButtonAction}
+                            >
+                                {secondaryButtonText}
+                            </button>
+                            )}
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
 }
+
+export default ModalWithForm;
 
 ModalWithForm.propTypes = {
   isOpen: PropTypes.bool.isRequired,

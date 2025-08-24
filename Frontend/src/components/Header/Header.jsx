@@ -9,10 +9,12 @@ import './Header.css';
 export default function Header({
   onOpenLogin,
   onLogout,
+  onLoginClick,
+  onRegisterClick,
   onOpenRegister = () => {},
 }) {
-  const user = useContext(CurrentUserContext);
-  const isLoggedIn = Boolean(user?.id);
+  const currentUser = useContext(CurrentUserContext);
+  const isLoggedIn = !!currentUser?.userId;
 
   // Optional: guard Saved Pets link when logged out
   const handleSavedClick = (e) => {
@@ -25,7 +27,7 @@ export default function Header({
   return (
     <header className="header">
       <Link className="header__brand" to="/" aria-label="Perfect Pet Finder home">
-        <img className="header__logo" src={logoUrl} width="22" height="22" alt="" aria-hidden="true" />
+        <img className="header__logo" src={logoUrl} alt="" aria-hidden="true" />
         <span className="header__name">Perfect Pet Finder</span>
       </Link>
 
@@ -54,7 +56,7 @@ export default function Header({
           <>
           <div className="header__profile">
             <span className="header__avatar" aria-hidden="true">{initial}</span>
-            <span className="header__who">{user.name || 'User'}</span>
+            <span className="header__user">{user.name || 'User'}</span>
             <button className="header__btn header__btn--outline" onClick={onLogout}>Sign Out</button>
           </div>
             <span className="header__user">Hi, {user.name || 'User'}</span>
@@ -64,18 +66,14 @@ export default function Header({
           </>
           
         ) : (
-          <>
-            <button className="header__btn" onClick={onOpenLogin} aria-label="Sign in">
-              Sign In
+          <div className="header__btn-container">
+            <button onClick={onLoginClick} className="header__login-btn" type="button">
+              Log In
             </button>
-            <button
-              className="header__btn header__btn--primary"
-              onClick={onOpenRegister}
-              aria-label="Create an account"
-            >
+            <button onClick={onRegisterClick} className="header__register-btn" type="button">
               Register
             </button>
-          </>
+          </div>
         )}
       </div>
     </header>

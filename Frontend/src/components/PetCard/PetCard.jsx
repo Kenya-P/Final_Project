@@ -28,12 +28,12 @@ export default function PetCard({
   };
 
   return (
-    <article className={`pet-card pet-card--${variant}`}>
+    <li className={`pet-card pet-card--${variant}`}>
       <a className="pet-card__image-link" href={url || '#'} target="_blank" rel="noopener noreferrer">
         <img className="pet-card__image" src={img} alt={name} />
       </a>
 
-      <div className="pet-card__meta">
+      <div className="pet-card__info">
         <h3 className="pet-card__name">{name}</h3>
         <p className="pet-card__line">{breed}</p>
         <p className="pet-card__line">{age || 'Age unknown'}</p>
@@ -54,7 +54,7 @@ export default function PetCard({
           </button>
         )}
       </div>
-    </article>
+    </li>
   );
 }
 

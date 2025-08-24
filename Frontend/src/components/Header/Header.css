@@ -26,6 +26,9 @@
 .header__logo { 
   font-size: 22px; 
   line-height: 1; 
+  width: 22px; 
+  height: 22px;
+  object-fit: contain;
 }
 .header__name {
   font-weight: 800;
@@ -90,9 +93,39 @@
   font-weight: 700; 
   font-size: .9rem;
 }
-.header__who { 
+.header__user { 
   font-weight: 600; 
   color: #111; 
+}
+
+.header__btn-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header__login-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+}
+
+.header__logout-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+}
+
+.header__register-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
 }
 
 @media (max-width: 720px) {
