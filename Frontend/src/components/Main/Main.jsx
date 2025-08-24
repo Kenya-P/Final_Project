@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { getPets } from '../../../utils/PetFinderApi';
 import PetCard from '../PetCard/PetCard';
 import Preloader from '../Preloader/Preloader';
-import FiltersPanel from '../FlitersPanel/FiltersPanel.jsx';
+import FiltersPanel from '../FiltersPanel/FiltersPanel.jsx';
 import './Main.css';
 
 export default function Main(props) {
@@ -33,18 +33,18 @@ export default function Main(props) {
   const [err, setErr] = useState('');
 
   useEffect(() => {
-    (async () => {
-      try {
-        const list = await getPets({ type: 'Dog', location: 'New York, NY' });
-        setPets(list);
-      } catch (e) {
-        setErr('Could not load live data.');
-        // setPets(fallback); // optional: fallback to mock
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    setLoading(true);
+    setErr('');
+    getPets({
+      type: selectedType || undefined,
+    }).then((data) => {
+      setPets(data.animals);
+      setLoading(false);
+    }).catch((e) => {
+      setErr(e.message || 'An error occurred while fetching pets.');
+      setLoading(false);
+    });
+  }, [selectedType]);
 
   const handleToggle = (pet) =>
     toggleLike(pet).catch((e) => {

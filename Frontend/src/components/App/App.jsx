@@ -15,17 +15,26 @@ import ProtectedRoute from '../../contexts/ProtectedRoute.jsx';
 import CurrentUserContext from '../../contexts/CurrentUserContext.jsx';
 
 export default function App() {
+  const [currentUser, setCurrentUser] = useState(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState({});
-  const [loginError, setLoginError] = useState('');
+  const [loginError, setLoginError] = useState("");
 
-  // search state lives here (rubric-friendly)
-  const petApi = usePetSearch({ sort: 'recent', limit: 20 });
-  const { loadPets, loadSavedPets } = petApi;
+  const {
+    // data
+    types, animals, savedPets, pagination, genderOptions, sizeOptions, ageOptions,
+    // selections
+    selectedType, gender, size, age, city, state, q,
+    // ui
+    loading, error, canPrev, canNext,
+    // actions
+    loadPets, loadSavedPets, toggleLike, isPetSaved,
+    onTypeChange, onGenderChange, onSizeChange, onAgeChange,
+    onCityChange, onStateChange, onQueryChange, clearFilters,
+  } = usePetSearch();
 
-  // initial data
-  useEffect(() => { loadPets(); }, [loadPets]);
+  // load first page on mount / when filters change (if your hook doesn't already do it)
+  useEffect(() => { loadPets(); }, [selectedType, gender, size, age, city, state, q, loadPets]);
 
   // refresh saved list after login/logout
   useEffect(() => {
@@ -57,9 +66,9 @@ export default function App() {
   }
 
   function handleLogout() {
-    logOut().finally(() => {
-      setCurrentUser({});
-    });
+    logOut()
+      .catch((e) => console.error("Logout error:", e))
+      .finally(() => setCurrentUser(null));
   }
 
   return (
@@ -71,20 +80,64 @@ export default function App() {
           onLogout={handleLogout}
         />
 
-        <Routes>
-          <Route path="/" element={<Main {...petApi} />} />
-          <Route
-            path="/profile"
-            element={
-            <ProtectedRoute element={(props) => 
-            <Profile {...props} 
-            savedPets={petApi.savedPets} 
-            loadSavedPets={petApi.loadSavedPets} 
-            toggleLike={petApi.toggleLike} />} 
-            isLoggedIn={!!currentUser?.id} />
-          }
-          />
-        </Routes>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Main
+                  // data
+                  types={types}
+                  animals={animals}
+                  savedPets={savedPets}
+                  pagination={pagination}
+                  genderOptions={genderOptions}
+                  sizeOptions={sizeOptions}
+                  ageOptions={ageOptions}
+                  // selections
+                  selectedType={selectedType}
+                  gender={gender}
+                  size={size}
+                  age={age}
+                  city={city}
+                  state={state}
+                  q={q}
+                  // ui
+                  loading={loading}
+                  error={error}
+                  canPrev={canPrev}
+                  canNext={canNext}
+                  // actions
+                  loadPets={loadPets}
+                  loadSavedPets={loadSavedPets}
+                  toggleLike={toggleLike}
+                  isPetSaved={isPetSaved}
+                  onTypeChange={onTypeChange}
+                  onGenderChange={onGenderChange}
+                  onSizeChange={onSizeChange}
+                  onAgeChange={onAgeChange}
+                  onCityChange={onCityChange}
+                  onStateChange={onStateChange}
+                  onQueryChange={onQueryChange}
+                  clearFilters={clearFilters}
+                  onAuthRequired={() => setIsLoginOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute
+                  isLoggedIn={!!currentUser}
+                  element={Profile}
+                  savedPets={savedPets}
+                  loadSavedPets={loadSavedPets}
+                  toggleLike={toggleLike}
+                  onAuthRequired={() => setIsLoginOpen(true)}
+                />
+              }
+            />
+          </Routes>
+
           <Footer />
 
           <div>

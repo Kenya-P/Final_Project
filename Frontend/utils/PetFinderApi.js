@@ -1,6 +1,6 @@
 import { getCurrentUserId } from "./auth";
 
-const API_BASE = "/api/pf";
+const API_BASE = import.meta?.env?.VITE_API_BASE || "";
 
 // ---- helpers ----
 async function parseProblem(res) {
@@ -27,11 +27,11 @@ function originless(url) {
 }
 
 async function getJson(path, params = {}) {
-  const url = new URL(`${API_BASE}${path}`, window.location.origin);
+  const url = new URL(`${API_BASE}/api/pf${path}`, window.location.origin);
   Object.entries(params).forEach(([k, v]) => {
     if (v != null && String(v).trim() !== "") url.searchParams.set(k, v);
   });
-  const res = await fetch(originless(url));
+  const res = await fetch(originless(url), { cache: "no-store" });
   return await assertOk(res);
 }
 
@@ -59,6 +59,8 @@ export async function getPets(params = {}) {
     url: a.url,
     contact: a.contact,
     published_at: a.published_at,
+    // keep the raw photos too so components that expect it still work
+    photos: a?.photos ?? [],
   }));
 
   return {

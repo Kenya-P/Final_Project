@@ -13,7 +13,11 @@ export default function PetCard({
   onAuthRequired = () => {},
 }) {
   const { name, breeds, age, photos, url } = pet;
-  const img = photos?.[0]?.medium || photos?.[0]?.small || 'https://via.placeholder.com/300x200?text=Pet';
+  const img =
+    pet.imageUrl ||
+    pet?.photos?.[0]?.medium ||
+    pet?.photos?.[0]?.small ||
+    "https://via.placeholder.com/300x200?text=Pet";
   const breed = breeds?.primary || 'Unknown breed';
   const currentUser = useContext(CurrentUserContext);
 
