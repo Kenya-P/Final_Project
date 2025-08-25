@@ -12,6 +12,7 @@ const readJSON = (k, fb) => {
     return fb;
   }
 };
+
 const writeJSON = (k, v) => localStorage.setItem(k, JSON.stringify(v ?? null));
 
 function getUsers() { return readJSON(LS_USERS, []); }
