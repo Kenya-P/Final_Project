@@ -20,6 +20,8 @@
   --font-mono: "Roboto", "Ubuntu Mono", "Courier New", monospace;
   --bg: #fff;
   --fg: #111;
+  --page-bg: #fff;
+  --header-h:72px;
 }
 
 /* Base */
@@ -41,6 +43,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--page-bg)
 }
 
 h1 {

@@ -7,11 +7,11 @@ import logoUrl from '../../assets/images/logo.svg';
 import './Header.css';
 
 export default function Header({
-  onOpenLogin,
+  onLogin,
   onLogout,
   onLoginClick,
   onRegisterClick,
-  onOpenRegister = () => {},
+  onRegister = () => {},
 }) {
   const currentUser = useContext(CurrentUserContext);
   const isLoggedIn = !!currentUser?.userId;
@@ -20,7 +20,7 @@ export default function Header({
   const handleSavedClick = (e) => {
     if (!isLoggedIn) {
       e.preventDefault();
-      onOpenLogin();
+      onLogin();
     }
   };
 
@@ -81,7 +81,7 @@ export default function Header({
 }
 
 Header.propTypes = {
-  onOpenLogin: PropTypes.func.isRequired,
-  onOpenRegister: PropTypes.func.isRequired,
+  onLogin: PropTypes.func.isRequired,
+  onRegister: PropTypes.func.isRequired,
   onLogout: PropTypes.func.isRequired,
 };

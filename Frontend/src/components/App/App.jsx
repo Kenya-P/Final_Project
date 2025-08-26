@@ -5,6 +5,7 @@ import Main from '../Main/Main.jsx';
 import Profile from '../Profile/Profile.jsx';
 import Header from '../Header/Header.jsx';
 import Footer from '../Footer/Footer.jsx';
+import ModalWithForm from '../ModalWithForm/ModalWithForm.jsx';
 import LoginModal from '../LoginModal/LoginModal.jsx';
 import RegisterModal from '../RegisterModal/RegisterModal.jsx';
 import { logIn, registerUser, logOut } from '../../../utils/auth.js';
@@ -75,8 +76,8 @@ export default function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <Router>
         <Header
-          onOpenLogin={() => setIsLoginOpen(true)}
-          onOpenRegister={() => setIsRegisterOpen(true)}
+          onLogin={() => setIsLoginOpen(true)}
+          onRegister={() => setIsRegisterOpen(true)}
           onLogout={handleLogout}
         />
 
