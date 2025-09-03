@@ -14,7 +14,9 @@ export default function Header({
   onRegister = () => {},
 }) {
   const currentUser = useContext(CurrentUserContext);
-  const isLoggedIn = !!currentUser?.userId;
+  const isLoggedIn = !!currentUser?.userId || !!currentUser?.id;
+  const user = currentUser || {};
+  const initial = String(user.name || user.email || 'U').charAt(0).toUpperCase();
 
   // Optional: guard Saved Pets link when logged out
   const handleSavedClick = (e) => {

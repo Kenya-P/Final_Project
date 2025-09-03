@@ -1,10 +1,10 @@
 import React, { useState, useContext, memo } from "react";
 import PropTypes from "prop-types";
 import CurrentUserContext from "../../contexts/CurrentUserContext.jsx";
+import PLACEHOLDER from "../../assets/images/placeholder.svg";
 import "./PetCard.css";
 
-// put a small icon at: public/img/paw-placeholder.svg
-const PLACEHOLDER = "/img/paw-placeholder.svg";
+//const PLACEHOLDER = "../assets/images/placeholder.svg";
 
 function PetCard({
   pet,

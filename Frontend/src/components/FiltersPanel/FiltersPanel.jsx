@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useId } from 'react';
 import './FiltersPanel.css';
 
 export default function FiltersPanel({
@@ -28,6 +29,9 @@ export default function FiltersPanel({
   clearFilters = () => {},
   onClose, // optional (used in mobile dropdown to close)
 }) {
+  const uid = useId();
+  const id = (name) => `${uid}-${name}`;
+
   const disableClear =
     loading || (!selectedType && !gender && !size && !age && !city && !state && !q);
 
