@@ -1,6 +1,6 @@
 import { getCurrentUserId } from "./auth";
 
-const API_BASE = import.meta?.env?.VITE_API_BASE || "";
+const API_BASE = import.meta.env.VITE_API_BASE || "";
 
 // ---- helpers ----
 async function parseProblem(res) {
