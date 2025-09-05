@@ -18,6 +18,9 @@ function RegisterModal({ isOpen, onClose, onRegister, isLoading, onClickLogin })
       password: '',
     });
 
+  const { overlayProps } = useModal(isOpen, onClose);
+  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isValid && Object.keys(errors).length === 0) {

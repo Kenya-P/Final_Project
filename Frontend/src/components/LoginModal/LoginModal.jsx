@@ -11,6 +11,8 @@ function LoginModal({ isOpen, onClose, onLogin, isLoading, onClickRegister }) {
         password: ''
     });
 
+    const { overlayProps } = useModal(isOpen, onClose);
+
     const handleSubmit = (e) => {
         e.preventDefault();
         onLogin(values);
