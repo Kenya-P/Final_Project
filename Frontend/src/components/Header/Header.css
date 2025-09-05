@@ -3,7 +3,7 @@
   position: sticky;
   top: 0;
   gap: 12px;
-  z-index: 1000;
+  z-index: 1;
   background: #fff;
   border-bottom: 1px solid #eee;
   padding: 14px 20px;

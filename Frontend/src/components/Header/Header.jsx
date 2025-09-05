@@ -11,7 +11,6 @@ export default function Header({
   onLogout,
   onLoginClick,
   onRegisterClick,
-  onRegister = () => {},
 }) {
   const currentUser = useContext(CurrentUserContext);
   const isLoggedIn = !!currentUser?.userId || !!currentUser?.id;
