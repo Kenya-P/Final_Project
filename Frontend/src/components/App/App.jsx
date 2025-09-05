@@ -1,14 +1,13 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Main from '../Main/Main.jsx';
 import Profile from '../Profile/Profile.jsx';
 import Header from '../Header/Header.jsx';
 import Footer from '../Footer/Footer.jsx';
-import ModalWithForm from '../ModalWithForm/ModalWithForm.jsx';
 import LoginModal from '../LoginModal/LoginModal.jsx';
 import RegisterModal from '../RegisterModal/RegisterModal.jsx';
+
 import { logIn, registerUser, logOut } from '../../../utils/auth.js';
 import usePetSearch from '../../hooks/usePetSearch.js';
 import './App.css';
@@ -20,142 +19,113 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [loginError, setLoginError] = useState("");
+  const [loginError, setLoginError] = useState('');
+  const [registerError, setRegisterError] = useState('');
 
-  const {
-    // data
-    types, animals, savedPets, pagination, genderOptions, sizeOptions, ageOptions,
-    // selections
-    selectedType, gender, size, age, city, state, q,
-    // ui
-    loading, error, canPrev, canNext,
-    // actions
-    loadPets, loadSavedPets, toggleLike, isPetSaved,
-    onTypeChange, onGenderChange, onSizeChange, onAgeChange,
-    onCityChange, onStateChange, onQueryChange, clearFilters,
-  } = usePetSearch();
+  const search = usePetSearch();
 
-  // load first page on mount / when filters change (if your hook doesn't already do it)
-  useEffect(() => { loadPets(); }, [selectedType, gender, size, age, city, state, q, loadPets]);
+  const openLogin = () => setIsLoginOpen(true);
+  const openRegister = () => setIsRegisterOpen(true);
+  const closeModals = () => {
+    setIsLoginOpen(false);
+    setIsRegisterOpen(false);
+    setLoginError('');
+    setRegisterError('');
+  };
 
-  // refresh saved list after login/logout
-  useEffect(() => {
-    if (currentUser?.id) loadSavedPets();
-  }, [currentUser, loadSavedPets]);
+  const onAuthRequired = () => {
+    setIsLoginOpen(true);
+  };
 
-  function handleLogin(credentials) {
-    logIn(credentials)
-      .then((data) => {
-        setCurrentUser(data.user);
-        setIsLoginOpen(false);
-        setLoginError('');
-      })
-      .catch((err) => {
-        console.error('Login error:', err);
-        setLoginError('Login failed. Please try again.');
-      });
+  async function handleLoginSubmit({ email, password }) {
+    setLoginError('');
+    try {
+      const res = await logIn({ email, password });
+      const user = res?.user ?? res;
+      setCurrentUser(user);
+      closeModals();
+      if (typeof search.loadSavedPets === 'function') search.loadSavedPets();
+    } catch (e) {
+      setLoginError(e?.message || 'Login failed');
+    }
   }
 
-  function handleRegister(userData) {
-    registerUser(userData)
-      .then((res) => {
-        if (res.user) {
-          setIsRegisterOpen(false);
-          setCurrentUser(res.user);
-        }
-      })
-      .catch((err) => console.error('Registration error:', err));
+  async function handleRegisterSubmit(formValues) {
+    setRegisterError('');
+    try {
+      const res = await registerUser(formValues);
+      const user = res?.user ?? res;
+      setCurrentUser(user);
+      closeModals();
+    } catch (e) {
+      setRegisterError(e?.message || 'Registration failed');
+    }
   }
 
-  function handleLogout() {
-    logOut()
-      .catch((e) => console.error("Logout error:", e))
-      .finally(() => setCurrentUser(null));
+  async function handleLogout() {
+    try { await logOut?.(); } finally { setCurrentUser(null); }
   }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <Router>
         <Header
-          onLogin={() => setIsLoginOpen(true)}
-          onRegister={() => setIsRegisterOpen(true)}
-          onLogout={handleLogout}
+          onLoginClick={openLogin}
+          onRegisterClick={openRegister}
+          onLogoutClick={handleLogout}
+          currentUser={currentUser}
         />
 
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <Main
-                  // data
-                  types={types}
-                  animals={animals}
-                  savedPets={savedPets}
-                  pagination={pagination}
-                  genderOptions={genderOptions}
-                  sizeOptions={sizeOptions}
-                  ageOptions={ageOptions}
-                  // selections
-                  selectedType={selectedType}
-                  gender={gender}
-                  size={size}
-                  age={age}
-                  city={city}
-                  state={state}
-                  q={q}
-                  // ui
-                  loading={loading}
-                  error={error}
-                  canPrev={canPrev}
-                  canNext={canNext}
-                  // actions
-                  loadPets={loadPets}
-                  loadSavedPets={loadSavedPets}
-                  toggleLike={toggleLike}
-                  isPetSaved={isPetSaved}
-                  onTypeChange={onTypeChange}
-                  onGenderChange={onGenderChange}
-                  onSizeChange={onSizeChange}
-                  onAgeChange={onAgeChange}
-                  onCityChange={onCityChange}
-                  onStateChange={onStateChange}
-                  onQueryChange={onQueryChange}
-                  clearFilters={clearFilters}
-                  onAuthRequired={() => setIsLoginOpen(true)}
-                />
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute
-                  isLoggedIn={!!currentUser}
-                  element={Profile}
-                  savedPets={savedPets}
-                  loadSavedPets={loadSavedPets}
-                  toggleLike={toggleLike}
-                  onAuthRequired={() => setIsLoginOpen(true)}
-                />
-              }
-            />
-          </Routes>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Main
+                types={search.types}
+                animals={search.animals}
+                savedPets={search.savedPets}
+                pagination={search.pagination}
+                genderOptions={search.genderOptions}
+                sizeOptions={search.sizeOptions}
+                ageOptions={search.ageOptions}
+                selectedType={search.selectedType}
+                gender={search.gender}
+                size={search.size}
+                age={search.age}
+                city={search.city}
+                state={search.state}
+                q={search.q}
+                loading={search.loading}
+                error={search.error}
+                canPrev={search.canPrev}
+                canNext={search.canNext}
+                loadPets={search.loadPets}
+                loadSavedPets={search.loadSavedPets}
+                toggleLike={search.toggleLike}
+                isPetSaved={search.isPetSaved}
+                onTypeChange={search.onTypeChange}
+                onGenderChange={search.onGenderChange}
+                onSizeChange={search.onSizeChange}
+                onAgeChange={search.onAgeChange}
+                onCityChange={search.onCityChange}
+                onStateChange={search.onStateChange}
+                onQueryChange={search.onQueryChange}
+                clearFilters={search.clearFilters}
+                onAuthRequired={onAuthRequired}
+                isAuthenticated={Boolean(currentUser?._id)}
+              />
+            }
+          />
+          <Route
+            path="/profile"
+            element={<ProtectedRoute currentUser={currentUser}><Profile /></ProtectedRoute>}
+          />
+        </Routes>
 
-          <Footer />
+        <Footer />
 
-          <div>
-            <LoginModal
-              isOpen={isLoginOpen}
-              onClose={() => setIsLoginOpen(false)}
-              onLogin={handleLogin}
-            />
-
-            <RegisterModal
-              isOpen={isRegisterOpen}
-              onClose={() => setIsRegisterOpen(false)}
-              onRegister={handleRegister}
-            />
-          </div>
-        {loginError && <p className="error">{loginError}</p>}
+        <LoginModal isOpen={isLoginOpen} onClose={closeModals} onSubmit={handleLoginSubmit} error={loginError} />
+        <RegisterModal isOpen={isRegisterOpen} onClose={closeModals} onSubmit={handleRegisterSubmit} error={registerError} />
       </Router>
     </CurrentUserContext.Provider>
   );

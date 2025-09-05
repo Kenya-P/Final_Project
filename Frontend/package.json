@@ -12,6 +12,10 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kenya-P/Final_Project.git"
+  },
   "prettier": {
     "semi": true,
     "singleQuote": true,

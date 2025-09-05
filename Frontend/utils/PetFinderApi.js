@@ -1,10 +1,30 @@
-import { getCurrentUserId } from "./auth";
+import { getCurrentUserId } from './auth';
 
-const API_BASE = import.meta.env.VITE_API_BASE || "";
+// Accept either name; prefer VITE_API_BASE
+const RAW_BASE =
+  import.meta?.env?.VITE_API_BASE ??
+  import.meta?.env?.VITE_API_BASE_URL ??
+  '';
+
+const API_BASE = String(RAW_BASE).replace(/\/+$/, ''); // trim trailing slash
+
+// join base + path safely
+const join = (path = '') =>
+  `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+
+// query-string helper
+const toQS = (params = {}) => {
+  const usp = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v != null && String(v).trim() !== '') usp.set(k, v);
+  });
+  const qs = usp.toString();
+  return qs ? `?${qs}` : '';
+};
 
 // ---- helpers ----
 async function parseProblem(res) {
-  let text = await res.text().catch(() => "");
+  let text = await res.text().catch(() => '');
   try {
     return JSON.parse(text);
   } catch {
@@ -22,27 +42,21 @@ async function assertOk(res) {
   return res.json();
 }
 
-function originless(url) {
-  return url.toString().replace(window.location.origin, "");
-}
-
 async function getJson(path, params = {}) {
-  const url = new URL(`${API_BASE}/api/pf${path}`, window.location.origin);
-  Object.entries(params).forEach(([k, v]) => {
-    if (v != null && String(v).trim() !== "") url.searchParams.set(k, v);
-  });
-  const res = await fetch(originless(url), { cache: "no-store" });
-  return await assertOk(res);
+  // Build an ABSOLUTE URL for prod (https://.../api/...), or /api/... in dev.
+  const url = `${join(`/pf${path}`)}${toQS(params)}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  return assertOk(res);
 }
 
 // ---- Petfinder passthroughs ----
 export async function getAnimalTypes() {
-  const data = await getJson("/types");
+  const data = await getJson('/types');
   return { types: data.types ?? [] };
 }
 
 export async function getPets(params = {}) {
-  const data = await getJson("/animals", params);
+  const data = await getJson('/animals', params);
 
   const animals = (data.animals ?? []).map((a) => ({
     id: a.id,
@@ -51,15 +65,14 @@ export async function getPets(params = {}) {
     imageUrl:
       a?.photos?.[0]?.medium ||
       a?.primary_photo_cropped?.medium ||
-      "",
+      '',
     age: a.age,
     gender: a.gender,
     size: a.size,
-    breeds: a?.breeds?.primary || "",
+    breeds: a?.breeds?.primary || '',
     url: a.url,
     contact: a.contact,
     published_at: a.published_at,
-    // keep the raw photos too so components that expect it still work
     photos: a?.photos ?? [],
   }));
 
@@ -76,7 +89,7 @@ export async function getPets(params = {}) {
 }
 
 // ---- Likes (localStorage, per user) ----
-const LS_LIKES_PREFIX = "pf_likes_";
+const LS_LIKES_PREFIX = 'pf_likes_';
 const likesKey = (uid) => `${LS_LIKES_PREFIX}${uid}`;
 const readJSON = (k, fb) => {
   try {
@@ -93,7 +106,7 @@ const saveUserLikes = (uid, a) => writeJSON(likesKey(uid), a);
 export async function getUserPets() {
   const uid = getCurrentUserId();
   if (!uid) {
-    const e = new Error("Unauthorized");
+    const e = new Error('Unauthorized');
     e.status = 401;
     throw e;
   }
@@ -105,7 +118,7 @@ export async function getUserPets() {
 export async function likePet(petId) {
   const uid = getCurrentUserId();
   if (!uid) {
-    const e = new Error("Unauthorized");
+    const e = new Error('Unauthorized');
     e.status = 401;
     throw e;
   }
@@ -118,7 +131,7 @@ export async function likePet(petId) {
 export async function unlikePet(petId) {
   const uid = getCurrentUserId();
   if (!uid) {
-    const e = new Error("Unauthorized");
+    const e = new Error('Unauthorized');
     e.status = 401;
     throw e;
   }

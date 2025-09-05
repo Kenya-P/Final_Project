@@ -21,13 +21,11 @@ function PetCard({
   const currentUser = useContext(CurrentUserContext);
   const [src, setSrc] = useState(imageUrl || PLACEHOLDER);
 
-  // consider both prop and context (if you store saved pets there)
   const liked =
     !!isSaved ||
     !!currentUser?.savedPets?.some((p) => String(p.id) === String(id));
 
   const handleLikeClick = () => {
-    // if you require auth to save
     if (!currentUser || (!currentUser.id && !currentUser._id)) {
       onAuthRequired?.();
       return;

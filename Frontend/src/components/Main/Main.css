@@ -19,7 +19,7 @@
   align-items: start;
 }
 
-/* Sidebar only visible ≥1024px */
+/* Sidebar only visible â‰¥1024px */
 .main__sidebar { display: none; }
 @media (min-width: 1024px) {
   .main__sidebar { display: block; }
