@@ -1,30 +1,18 @@
 import { useEffect } from "react";
 
-function useModalClose(isOpen, onClose) {
-
+export default function useModalClose(isOpen, onClose) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleEscape = (e) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
+    const onEsc = (e) => e.key === "Escape" && onClose();
+    const onOverlay = (e) =>
+      e.target && e.target.classList && e.target.classList.contains("modal") && onClose();
 
-    const handleOverlay = (e) => {
-      if (e.target.classList.contains("modal")) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    document.addEventListener("mousedown", handleOverlay);
-
+    document.addEventListener("keydown", onEsc);
+    document.addEventListener("mousedown", onOverlay);
     return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.removeEventListener("mousedown", handleOverlay);
+      document.removeEventListener("keydown", onEsc);
+      document.removeEventListener("mousedown", onOverlay);
     };
   }, [isOpen, onClose]);
 }
-
-export default useModalClose;
