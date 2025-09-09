@@ -1,16 +1,20 @@
 import { getCurrentUserId } from './auth';
 
-// Accept either name; prefer VITE_API_BASE
 const RAW_BASE =
-  import.meta?.env?.VITE_API_BASE ??
-  import.meta?.env?.VITE_API_BASE_URL ??
-  '';
+  (import.meta.env.PROD
+    ? (import.meta.env.VITE_API_BASE ?? import.meta.env.VITE_API_BASE_URL ?? '')
+    : '');
 
 const API_BASE = String(RAW_BASE).replace(/\/+$/, ''); // trim trailing slash
 
-// join base + path safely
-const join = (path = '') =>
-  `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+if (import.meta.env.PROD && !API_BASE) {
+ console.warn(
+   'VITE_API_BASE is not set for production. API requests will go to this GitHub Pages origin and 404.'
+  );
+}
+
+// join base + path safely (absolute in PROD, relative in DEV)
+const join = (path = '') => `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
 
 // query-string helper
 const toQS = (params = {}) => {
