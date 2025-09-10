@@ -29,7 +29,7 @@
     position: absolute;
     top: 20px;
     right: 28px;
-    background-image: url(../../assets/close-button.svg);
+    background-image: url('../../assets/images/close-button.svg');
     background-repeat: no-repeat;
     background-position: center;
     height: 16px;
