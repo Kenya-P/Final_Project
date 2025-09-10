@@ -1,20 +1,14 @@
 import { getCurrentUserId } from './auth';
 
+// Accept either name; prefer VITE_API_BASE
 const RAW_BASE =
-  (import.meta.env.PROD
-    ? (import.meta.env.VITE_API_BASE ?? import.meta.env.VITE_API_BASE_URL ?? '')
-    : '');
+  import.meta?.env?.VITE_API_BASE ?? '';
 
 const API_BASE = String(RAW_BASE).replace(/\/+$/, ''); // trim trailing slash
 
-if (import.meta.env.PROD && !API_BASE) {
- console.warn(
-   'VITE_API_BASE is not set for production. API requests will go to this GitHub Pages origin and 404.'
-  );
-}
-
-// join base + path safely (absolute in PROD, relative in DEV)
-const join = (path = '') => `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+// join base + path safely
+const join = (path = '') =>
+  `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
 
 // query-string helper
 const toQS = (params = {}) => {
@@ -48,7 +42,7 @@ async function assertOk(res) {
 
 async function getJson(path, params = {}) {
   // Build an ABSOLUTE URL for prod (https://.../api/...), or /api/... in dev.
-  const url = `${join(`/pf${path}`)}${toQS(params)}`;
+  const url = `${join(`/api${path}`)}${toQS(params)}`;
   const res = await fetch(url, { cache: 'no-store' });
   return assertOk(res);
 }
