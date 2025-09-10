@@ -1,88 +1,46 @@
-import { useContext } from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import CurrentUserContext from '../../contexts/CurrentUserContext.jsx';
+import React from "react";
+import PropTypes from "prop-types";
+import { Link, NavLink } from "react-router-dom";
+import "./Header.css";
 
-import logoUrl from '../../assets/images/logo.svg';
-import './Header.css';
+const noop = () => {};
 
-export default function Header({
-  onLogin,
-  onLogout,
-  onLoginClick,
-  onRegisterClick,
-}) {
-  const currentUser = useContext(CurrentUserContext);
-  const isLoggedIn = !!currentUser?.userId || !!currentUser?.id;
-  const user = currentUser || {};
-  const initial = String(user.name || user.email || 'U').charAt(0).toUpperCase();
-
-  // Optional: guard Saved Pets link when logged out
-  const handleSavedClick = (e) => {
-    if (!isLoggedIn) {
-      e.preventDefault();
-      onLogin();
-    }
-  };
-
+export default function Header({ currentUser, onLogin, onRegister, onLogout }) {
   return (
     <header className="header">
-      <Link className="header__brand" to="/" aria-label="Perfect Pet Finder home">
-        <img className="header__logo" src={logoUrl} alt="" aria-hidden="true" />
-        <span className="header__name">Perfect Pet Finder</span>
-      </Link>
+      <Link to="/" className="header__brand">Perfect Pet Finder</Link>
 
-      {/* Primary nav */}
-      <nav className="header__nav" aria-label="Primary">
-        <NavLink
-          to="/"
-          className={({ isActive }) => `header__link${isActive ? ' header__link--active' : ''}`}
-          end
-        >
-          Home
-        </NavLink>
+      <nav className="header__nav">
+        <NavLink to="/" className="header__link">Home</NavLink>
+        <NavLink to="/profile" className="header__link">Saved Pets</NavLink>
 
-        <NavLink
-          to="/profile"
-          onClick={handleSavedClick}
-          className={({ isActive }) => `header__link${isActive ? ' header__link--active' : ''}`}
-        >
-          Saved Pets
-        </NavLink>
-      </nav>
-
-      {/* Auth controls */}
-      <div className="header__auth">
-        {isLoggedIn ? (
+        {!currentUser ? (
           <>
-          <div className="header__profile">
-            <span className="header__avatar" aria-hidden="true">{initial}</span>
-            <span className="header__user">{user.name || 'User'}</span>
-            <button className="header__btn header__btn--outline" onClick={onLogout}>Sign Out</button>
-          </div>
-            <span className="header__user">Hi, {user.name || 'User'}</span>
-            <button className="header__btn" onClick={onLogout} aria-label="Sign out">
-              Sign Out
-            </button>
+            <button type="button" className="header__btn" onClick={onLogin}>Log In</button>
+            <button type="button" className="header__btn" onClick={onRegister}>Register</button>
           </>
-          
         ) : (
-          <div className="header__btn-container">
-            <button onClick={onLoginClick} className="header__login-btn" type="button">
-              Log In
-            </button>
-            <button onClick={onRegisterClick} className="header__register-btn" type="button">
-              Register
-            </button>
-          </div>
+          <>
+            <span className="header__user">{currentUser.name}</span>
+            <button type="button" className="header__btn" onClick={onLogout}>Log Out</button>
+          </>
         )}
-      </div>
+      </nav>
     </header>
   );
 }
 
 Header.propTypes = {
-  onLogin: PropTypes.func.isRequired,
-  onRegister: PropTypes.func.isRequired,
-  onLogout: PropTypes.func.isRequired,
+  currentUser: PropTypes.object,
+  onLogin: PropTypes.func,
+  onRegister: PropTypes.func,
+  onLogout: PropTypes.func,
 };
+
+Header.defaultProps = {
+  currentUser: null,
+  onLogin: noop,
+  onRegister: noop,
+  onLogout: noop,
+};
+

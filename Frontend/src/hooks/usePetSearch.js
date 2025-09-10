@@ -89,7 +89,7 @@ export default function usePetSearch(initial = {}) {
   }, [selectedType, gender, size, age, city, state, q, page, limit, sort]);
 
   // --- saved pets API
-  const loadSavedPets = useCallback(() => {
+ const loadSavedPets = useCallback(() => {
     return getUserPets()
       .then(({ animals = [] }) => setSavedPets(animals))
       .catch(() => setSavedPets([]));

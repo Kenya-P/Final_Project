@@ -1,13 +1,19 @@
-import { Navigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+import { Navigate } from "react-router-dom";
 
-function ProtectedRoute({ element: Component, isLoggedIn, ...props }) {
-  return isLoggedIn ? <Component {...props} /> : <Navigate to="/" replace />;
+export default function ProtectedRoute({
+  isLoggedIn,
+  element,
+  children,
+  redirectTo = "/",
+}) {
+  if (!isLoggedIn) return <Navigate to={redirectTo} replace />;
+  return element ?? children ?? null;
 }
 
 ProtectedRoute.propTypes = {
-  element: PropTypes.elementType.isRequired,
   isLoggedIn: PropTypes.bool.isRequired,
+  element: PropTypes.node,
+  children: PropTypes.node,
+  redirectTo: PropTypes.string,
 };
-
-export default ProtectedRoute;
