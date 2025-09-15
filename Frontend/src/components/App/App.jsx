@@ -45,6 +45,7 @@ export default function App() {
   const handleLogin = async ({ email, password }) => {
     setIsBusy(true);
     setLoginError("");
+    setLoading(true);
     try {
       const user = await logIn({ email, password }); // should return user object + token storage inside auth.js
       setCurrentUser(user);
@@ -55,21 +56,25 @@ export default function App() {
       setLoginError(e?.problem?.detail || e.message || "Login failed");
     } finally {
       setIsBusy(false);
+      setLoading(false);
     }
   };
 
   const handleRegister = async ({ name, avatar, email, password }) => {
     setIsBusy(true);
     setRegisterError("");
+    setLoading(true);
     try {
       await registerUser({ name, avatar, email, password });
       // After register, go straight to login modal
       setIsRegisterOpen(false);
       setIsLoginOpen(true);
+      closeModals();
     } catch (e) {
       setRegisterError(e?.problem?.detail || e.message || "Registration failed");
     } finally {
       setIsBusy(false);
+      setLoading(false);
     }
   };
 
@@ -143,6 +148,8 @@ export default function App() {
                 types={types}
                 savedPets={savedPets}
                 onToggleLike={toggleLike}
+                onAuthRequired={() => setIsLoginOpen(true)}
+                isAuthenticated={!!currentUser}
               />
             }
           />
@@ -165,7 +172,8 @@ export default function App() {
           isOpen={isLoginOpen}
           onClose={closeModals}
           onLogin={handleLogin}
-          isLoading={isBusy}
+          onSubmit={handleLogin}
+          Loading={Loading}
           onClickRegister={() => { setIsLoginOpen(false); setIsRegisterOpen(true); }}
           errorText={loginError}
         />
@@ -174,7 +182,7 @@ export default function App() {
           isOpen={isRegisterOpen}
           onClose={closeModals}
           onRegister={handleRegister}
-          isLoading={isBusy}
+          Loading={Loading}
           onClickLogin={() => { setIsRegisterOpen(false); setIsLoginOpen(true); }}
           errorText={registerError}
         />

@@ -1,18 +1,22 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 
-const isProd = process.env.NODE_ENV === "production";
+export default ({ mode }) => {
+  // Loads .env, .env.development, etc. into "env"
+  const env = loadEnv(mode, process.cwd(), "");
+  const API_TARGET = env.VITE_API_BASE || "http://localhost:3001";
 
-export default defineConfig({
-  plugins: [react({ jsxRuntime: "automatic" })],
-  base: isProd ? "/Final_Project/" : "/",   // <- dev at '/', prod at '/Final_Project/'
-  server: {
-    port: 3000,
-    proxy: {
-      // dev calls to /api/* go to your local backend
-      "/api": { target: "http://localhost:3001", changeOrigin: true },
-      // keep if your client uses /pf/*; otherwise you can remove this
-      "/pf":  { target: "http://localhost:3001", changeOrigin: true },
+  return defineConfig({
+    plugins: [react({ jsxRuntime: "automatic" })],
+    base: mode === "production" ? "/Final_Project/" : "/",
+    server: {
+      port: 3000,
+      proxy: {
+        // Proxy any front-end request under /api to your backend
+        "/api": { target: API_TARGET, changeOrigin: true },
+        // keep if you still hit /pf/* in your code
+        "/pf": { target: API_TARGET, changeOrigin: true },
+      },
     },
-  },
-});
+  });
+};

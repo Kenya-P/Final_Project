@@ -19,8 +19,8 @@
 
 .pet-card__img-wrap {
   width: 100%;
-  aspect-ratio: 4 / 3;         /* keeps a consistent box for all images */
-  background: #f3f4f6;         /* light skeleton bg */
+  aspect-ratio: 4 / 3;
+  background: #f3f4f6;
   overflow: hidden;
 }
 
