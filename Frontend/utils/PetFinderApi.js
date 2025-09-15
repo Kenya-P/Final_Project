@@ -4,7 +4,9 @@ import { getCurrentUserId } from './auth';
 const RAW_BASE =
   import.meta?.env?.VITE_API_BASE ?? '';
 
-const API_BASE = String(RAW_BASE).replace(/\/+$/, ''); // trim trailing slash
+const API_BASE = String(RAW_BASE).replace(/\/+$/, '');
+
+const API_PREFIX = import.meta?.env?.VITE_API_PREFIX ?? "/api";
 
 // join base + path safely
 const join = (path = '') =>
@@ -41,10 +43,14 @@ async function assertOk(res) {
 }
 
 async function getJson(path, params = {}) {
-  // Build an ABSOLUTE URL for prod (https://.../api/...), or /api/... in dev.
-  const url = `${join(`/api${path}`)}${toQS(params)}`;
-  const res = await fetch(url, { cache: 'no-store' });
-  return assertOk(res);
+  const url = `${join(`${API_PREFIX}${path}`)}${toQS(params)}`;
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    return await assertOk(res);
+  } catch (e) {
+    console.error("[PetFinderApi] GET failed:", url, e.problem ?? e);
+    throw e;
+  }
 }
 
 // ---- Petfinder passthroughs ----
