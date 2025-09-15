@@ -1,6 +1,9 @@
 .modal {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: #fff;
   display: flex;
   justify-content: center;
@@ -52,6 +55,10 @@
     width: 100%;
 }
 
+.modal__fieldset {
+    border-radius: 8px;
+}
+
 .modal__label {
     display: block;
     font-size: .875rem;
@@ -80,14 +87,14 @@
   padding: 0 18px;
   border-radius: 8px; 
   border: 0;
-  background: #999; 
+  background: #000; 
   color: #fff; 
   font-weight: 600;
   cursor: pointer;
 }
 
 .modal__submit:hover {
-    background-color: #00000099;
+    background-color: #000;
     opacity: 0.6;
 }
 
@@ -102,7 +109,6 @@
     line-height: 16px;
     margin: 0;
     padding: 0;
-    position: absolute;
 }
 
 .modal__submit[disabled] {

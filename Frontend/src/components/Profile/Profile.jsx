@@ -1,42 +1,47 @@
+import React from "react";
 import PropTypes from "prop-types";
+import PetCard from "../PetCard/PetCard.jsx";
 import "./Profile.css";
 
-const noop = () => {};
-
-export default function Profile({ savedPets, loadSavedPets, toggleLike }) {
+export default function Profile({
+  savedPets = [],
+  toggleLike = () => {},
+  title = "Your Saved Pets",
+  isAuthenticated = true,
+  onAuthRequired = () => {},
+}) {
+  const has = Array.isArray(savedPets) && savedPets.length > 0;
 
   return (
-    <section className="profile">
-      <h2>Your Saved Pets</h2>
-      {!savedPets?.length ? (
-        <p>No saved pets yet.</p>
-      ) : (
-        <ul className="profile__grid">
-          {savedPets.map((p) => (
-            <li key={p.id} className="profile__card">
-              <img src={p.primary_photo_cropped?.small || p.imageUrl} alt={p.name} />
-              <div className="profile__meta">
-                <h3>{p.name}</h3>
-                <button type="button" onClick={() => toggleLike(p)}>
-                  Remove
-                </button>
-              </div>
-            </li>
+    <main className="content">
+      <h2 className="profile__title">{title}</h2>
+
+      {!has && <p>No saved pets yet.</p>}
+
+      {has && (
+        <ul className="pet-grid">
+          {savedPets.map((pet) => (
+            <PetCard
+              key={pet.id ?? pet._id}
+              pet={pet}
+              isSaved={true}
+              canSave={isAuthenticated}
+              onToggleSave={() => toggleLike(pet)}
+              showRemove
+              onRemove={() => toggleLike(pet)}
+              onAuthRequired={onAuthRequired}
+            />
           ))}
         </ul>
       )}
-    </section>
+    </main>
   );
 }
 
 Profile.propTypes = {
   savedPets: PropTypes.arrayOf(PropTypes.object),
-  loadSavedPets: PropTypes.func,
   toggleLike: PropTypes.func,
-};
-
-Profile.defaultProps = {
-  savedPets: [],
-  loadSavedPets: noop,
-  toggleLike: noop,
+  title: PropTypes.string,
+  isAuthenticated: PropTypes.bool,
+  onAuthRequired: PropTypes.func,
 };

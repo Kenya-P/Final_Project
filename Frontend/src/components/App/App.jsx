@@ -31,9 +31,9 @@ export default function App() {
 
   const [savedPets, setSavedPets] = useState([]);
 
-  // ---------- Modal open/close ----------
-  const openLogin = () => setIsLoginOpen(true);
-  const openRegister = () => setIsRegisterOpen(true);
+  // ---------- Modal open/close (single source of truth) ----------
+  const openLogin = () => { setIsRegisterOpen(false); setIsLoginOpen(true); };
+  const openRegister = () => { setIsLoginOpen(false); setIsRegisterOpen(true); };
   const closeModals = () => {
     setIsLoginOpen(false);
     setIsRegisterOpen(false);
@@ -41,32 +41,77 @@ export default function App() {
     setRegisterError("");
   };
 
+  // ---------- Saved Pets helpers ----------
+  const loadSavedPets = useCallback((userId) => {
+    try {
+      const list = loadSaved(userId || "guest");
+      setSavedPets(Array.isArray(list) ? list : []);
+    } catch {
+      setSavedPets([]);
+    }
+  }, []);
+
+  const toggleLike = useCallback((pet) => {
+    setSavedPets((prev) => {
+      const exists = prev.some((p) => String(p.id) === String(pet.id));
+      const minimal = {
+        id: pet.id,
+        name: pet.name,
+        age: pet.age,
+        url: pet.url,
+        photos: pet.photos,
+        breeds: pet.breeds,
+        imageUrl: pet.imageUrl,
+        contact: pet.contact,
+      };
+      const next = exists ? prev.filter((p) => String(p.id) !== String(pet.id)) : [minimal, ...prev];
+      try { saveSaved(currentUser?._id || "guest", next); } catch {}
+      return next;
+    });
+  }, [currentUser?._id]);
+
+  // helper: merge guest saved pets into a user’s list (dedup by id)
+  const mergeGuestInto = useCallback((userId) => {
+    if (!userId) return;
+    try {
+      const guest = loadSaved("guest") || [];
+      const existing = loadSaved(userId) || [];
+      const byId = newMap();
+      [...existing, ...guest].forEach((p) => byId.set(String(p.id), p));
+      const merged = Array.from(byId.values());
+      saveSaved(userId, merged);
+      saveSaved("guest", []);
+      setSavedPets(merged);
+    } catch (error) {
+      console.error("mergeGuestInto failed:", error);
+    }
+  }, []);
+
+
   // ---------- Auth handlers ----------
   const handleLogin = async ({ email, password }) => {
     setIsBusy(true);
     setLoginError("");
-    setLoading(true);
     try {
-      const user = await logIn({ email, password }); // should return user object + token storage inside auth.js
+      const user = await logIn({ email, password });
       setCurrentUser(user);
-      // load saved pets for this user
-      setSavedPets(loadSavedPets(user?._id));
+      mergeGuestInto(user._id);
       closeModals();
     } catch (e) {
       setLoginError(e?.problem?.detail || e.message || "Login failed");
     } finally {
       setIsBusy(false);
-      setLoading(false);
     }
   };
 
   const handleRegister = async ({ name, avatar, email, password }) => {
     setIsBusy(true);
     setRegisterError("");
-    setLoading(true);
     try {
       await registerUser({ name, avatar, email, password });
-      // After register, go straight to login modal
+      const user = await logIn({ email, password });
+      setCurrentUser(user);
+      mergeGuestInto(user._id);      
       setIsRegisterOpen(false);
       setIsLoginOpen(true);
       closeModals();
@@ -74,125 +119,99 @@ export default function App() {
       setRegisterError(e?.problem?.detail || e.message || "Registration failed");
     } finally {
       setIsBusy(false);
-      setLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    try {
-      await logOut();
-    } finally {
-      setCurrentUser(null);
-      setSavedPets([]);
-    }
+    try { await logOut(); } catch {}
+    setCurrentUser(null);
+    setSavedPets([]);
+    closeModals();
   };
 
-  // ---------- Saved pets ----------
-  const loadSavedPets = useCallback(
-    (uid = currentUser?._id || "guest") => {
-      const items = loadSaved(uid);
-      setSavedPets(items);
-      return items;
-    },
-    [currentUser?._id]
-  );
-
-
-  const toggleLike = useCallback(
-    (pet) => {
-      const uid = currentUser?._id || "guest";
-      setSavedPets(prev => {
-        const exists = prev.some(p => p.id === pet.id);
-        const next = exists ? prev.filter(p => p.id !== pet.id) : [{ id: pet.id, ...pet }, ...prev];
-        saveSaved(uid, next);
-        return next;
-      });
-    },
-    [currentUser?._id]
-  );
-
-
-  // ---------- Data bootstrap ----------
   useEffect(() => {
     (async () => {
       try {
-        const [t, a] = await Promise.all([getAnimalTypes(), getPets({ page: 1 })]);
-        setTypes(t?.types || []);
-        setAnimals(a?.animals || []);
-      } catch (_) {
-        // ignore for now; surface on UI if you want
+        const t = await getAnimalTypes();
+        // normalize to string names regardless of API shape
+        const names = Array.from(new Set((t?.types || []).map((x) => (typeof x === "string" ? x : x?.name)).filter(Boolean)));
+        setTypes(names);
+      } catch (e) {
+        console.error("[App] getAnimalTypes failed:", e);
+      }
+      try {
+        const page1 = await getPets({ page: 1 });
+        setAnimals(page1?.animals || []);
+      } catch (e) {
+        console.error("[App] getPets failed:", e);
       }
     })();
   }, []);
 
-  // when user changes, (re)load their saved pets
+  // when user changes, reload their saved pets once
   useEffect(() => {
     if (currentUser?._id) loadSavedPets(currentUser._id);
   }, [currentUser?._id, loadSavedPets]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-        <Header
-          currentUser={currentUser}
-          onLogin={openLogin}
-          onRegister={openRegister}
-          onLogout={handleLogout}
-        />
+      <Header
+        currentUser={currentUser}
+        onLogin={openLogin}
+        onRegister={openRegister}
+        onLogout={handleLogout}
+      />
 
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Main
-                animals={animals}
-                types={types}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Main
+              animals={animals}
+              types={types}
+              savedPets={savedPets}
+              onToggleLike={toggleLike}
+            />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute isLoggedIn={!!currentUser}>
+              <Profile
                 savedPets={savedPets}
-                onToggleLike={toggleLike}
-                onAuthRequired={() => setIsLoginOpen(true)}
-                isAuthenticated={!!currentUser}
+                loadSavedPets={loadSavedPets}
+                toggleLike={toggleLike}
               />
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute isLoggedIn={!!currentUser}>
-                <Profile
-                  savedPets={savedPets}
-                  loadSavedPets={loadSavedPets}
-                  toggleLike={toggleLike}
-                />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-
-        {/* Modals */}
-        <LoginModal
-          isOpen={isLoginOpen}
-          onClose={closeModals}
-          onLogin={handleLogin}
-          onSubmit={handleLogin}
-          Loading={Loading}
-          onClickRegister={() => { setIsLoginOpen(false); setIsRegisterOpen(true); }}
-          errorText={loginError}
+            </ProtectedRoute>
+          }
         />
+      </Routes>
 
-        <RegisterModal
-          isOpen={isRegisterOpen}
-          onClose={closeModals}
-          onRegister={handleRegister}
-          Loading={Loading}
-          onClickLogin={() => { setIsRegisterOpen(false); setIsLoginOpen(true); }}
-          errorText={registerError}
-        />
+      {/* Modals */}
+      <LoginModal
+        isOpen={isLoginOpen}
+        onClose={closeModals}
+        onLogin={handleLogin}
+        isLoading={isBusy}
+        onClickRegister={openRegister}
+        errorText={loginError}
+      />
 
-        {/* example shared modal if you’re using ModalWithForm elsewhere */}
-        <ModalWithForm
-          isOpen={false}
-          onClose={() => {}}
-          title=""
-        />
+      <RegisterModal
+        isOpen={isRegisterOpen}
+        onClose={closeModals}
+        onRegister={handleRegister}
+        isLoading={isBusy}
+        onClickLogin={openLogin}
+        errorText={registerError}
+      />
+
+      <ModalWithForm
+        isOpen={false}
+        onClose={() => {}}
+        title=""
+      />
     </CurrentUserContext.Provider>
   );
 }

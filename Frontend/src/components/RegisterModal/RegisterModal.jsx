@@ -4,7 +4,7 @@ import ModalWithForm from "../ModalWithForm/ModalWithForm";
 import { useFormAndValidation } from "../../../utils/useFormAndValidation.js";
 import "./RegisterModal.css";
 
-export default function RegisterModal({ isOpen, onClose, onRegister, isLoading, onClickLogin }) {
+export default function RegisterModal({ isOpen, onClose, onRegister, isLoading, onClickLogin, errorText }) {
   const { values, handleChange, setValues, errors, isValid, resetForm } = useFormAndValidation({
     name: "",
     avatar: "",
@@ -12,94 +12,95 @@ export default function RegisterModal({ isOpen, onClose, onRegister, isLoading, 
     password: "",
   });
 
+  // Reset only when opened to avoid render loops
   useEffect(() => {
     if (isOpen) {
-      const empty = { name: "", avatar: "", email: "", password: "" };
-      setValues(empty);
-      resetForm(empty, {}, false);
+      setValues({ name: "", avatar: "", email: "", password: "" });
+      resetForm({ name: "", avatar: "", email: "", password: "" }, {}, false);
     }
-  }, [isOpen, setValues, resetForm]);
+  }, [isOpen]);
 
-  const handleSubmit = (e) => {
+
+  const submit = (e) => {
     e.preventDefault();
     if (!isValid) return;
-    onRegister({
-      name: values.name.trim(),
-      avatar: values.avatar.trim(),
-      email: values.email.trim(),
+    onRegister?.({
+      name: values.name,
+      avatar: values.avatar,
+      email: values.email,
       password: values.password,
     });
   };
 
+  if (!isOpen) return null;
+
   return (
     <ModalWithForm
-      title="Create an account"
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={handleSubmit}
-      buttonText="Register"
-      isLoading={isLoading}
-      disabled={!isValid}
-      secondaryButtonText="Already have an account? Log in"
-      secondaryButtonAction={onClickLogin}
+      onSubmit={submit}
+      title="Sign up"
+      subText={<span>or <button type="button" className="auth-link" onClick={onClickLogin}>Sign in</button></span>}
+      buttonText={isLoading ? "Creating…" : "Create account"}
+      disabled={!isValid || isLoading}
     >
-      <label className="modal__label">
-        Name
-        <input
-          name="name"
-          type="text"
-          className="modal__input"
-          placeholder="Your name"
-          required
-          minLength="2"
-          maxLength="30"
-          onChange={handleChange}
-          value={values.name || ""}
-        />
-        <span className="modal__input-error">{errors.name}</span>
-      </label>
+      <label className="modal__label" htmlFor="reg-name">Name</label>
+      <input
+        id="reg-name"
+        name="name"
+        type="text"
+        className="modal__input auth-input"
+        placeholder="Your name"
+        minLength="2"
+        maxLength="30"
+        required
+        onChange={handleChange}
+        value={values.name || ""}
+      />
+      <span className="modal__input-error">{errors.name}</span>
 
-      <label className="modal__label">
-        Avatar URL
-        <input
-          name="avatar"
-          type="url"
-          className="modal__input"
-          onChange={handleChange}
-          value={values.avatar || ""}
-        />
-        <span className="modal__input-error">{errors.avatar}</span>
-      </label>
+      <label className="modal__label" htmlFor="reg-avatar">Avatar URL (optional)</label>
+      <input
+        id="reg-avatar"
+        name="avatar"
+        type="url"
+        className="modal__input auth-input"
+        placeholder="https://…"
+        onChange={handleChange}
+        value={values.avatar || ""}
+      />
+      <span className="modal__input-error">{errors.avatar}</span>
 
-      <label className="modal__label">
-        Email
-        <input
-          name="email"
-          type="email"
-          className="modal__input"
-          placeholder="you@example.com"
-          required
-          onChange={handleChange}
-          value={values.email || ""}
-        />
-        <span className="modal__input-error">{errors.email}</span>
-      </label>
+      <label className="modal__label" htmlFor="reg-email">Email</label>
+      <input
+        id="reg-email"
+        name="email"
+        type="email"
+        className="modal__input auth-input"
+        placeholder="you@example.com"
+        required
+        onChange={handleChange}
+        value={values.email || ""}
+      />
+      <span className="modal__input-error">{errors.email}</span>
 
-      <label className="modal__label">
-        Password
-        <input
-          name="password"
-          type="password"
-          className="modal__input"
-          placeholder="Password"
-          required
-          minLength="8"
-          maxLength="64"
-          onChange={handleChange}
-          value={values.password || ""}
-        />
-        <span className="modal__input-error">{errors.password}</span>
-      </label>
+      <label className="modal__label" htmlFor="reg-password">Password</label>
+      <input
+        id="reg-password"
+        name="password"
+        type="password"
+        className="modal__input auth-input"
+        placeholder="Password (8–64 chars)"
+        minLength="8"
+        maxLength="64"
+        required
+        autoComplete="off"
+        onChange={handleChange}
+        value={values.password || ""}
+      />
+      <span className="modal__input-error">{errors.password}</span>
+
+      {errorText && <p role="alert" className="auth-error">{errorText}</p>}
     </ModalWithForm>
   );
 }
@@ -110,5 +111,5 @@ RegisterModal.propTypes = {
   onRegister: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
   onClickLogin: PropTypes.func,
+  errorText: PropTypes.string,
 };
-
