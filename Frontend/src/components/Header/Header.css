@@ -7,7 +7,7 @@
   background: #fff;
   border-bottom: 1px solid #eee;
   padding: 14px 20px;
-
+  font-family: Arial, Helvetica, sans-serif;
   /* 3-column grid: brand | nav (center) | actions */
   display: grid;
   grid-template-columns: 1fr auto 1fr;
