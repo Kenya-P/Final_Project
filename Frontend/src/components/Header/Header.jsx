@@ -2,6 +2,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Link, NavLink } from "react-router-dom";
+import logo from "../../assets/images/logo.svg";
 import "./Header.css";
 
 const noop = () => {};
@@ -14,6 +15,7 @@ export default function Header({
 }) {
   return (
     <header className="header">
+      <img src={logo} alt="Paw Print Logo" className="header__logo" />
       <Link to="/" className="header__brand">Perfect Pet Finder</Link>
       <nav className="header__nav">
         <NavLink to="/" className="header__link">Home</NavLink>

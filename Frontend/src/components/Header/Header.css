@@ -8,9 +8,8 @@
   border-bottom: 1px solid #eee;
   padding: 14px 20px;
   font-family: Arial, Helvetica, sans-serif;
-  /* 3-column grid: brand | nav (center) | actions */
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  flex-direction: row;
   align-items: center;
 }
 
@@ -38,9 +37,10 @@
 
 /* Nav (center) */
 .header__nav {
-  justify-self: center;
-  display: inline-flex;
-  gap: 32px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 20px 0
 }
 .header__link {
   color: #111;
@@ -57,9 +57,7 @@
 }
 
 .header__btn {
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 10px;
+  padding: 0;
   font-weight: 600;
   cursor: pointer;
   background-color: transparent;
@@ -69,11 +67,11 @@
   color: #111;
   border: 1px solid transparent;
 }
-.header__btn--outline:hover { 
+.header__btn:hover { 
   background: #f7f7f7; 
 }
 .header__btn:focus-visible { 
-  outline: 2px solid #2684ff; 
+  outline: 2px solid #eee; 
   outline-offset: 2px; 
 }
 
