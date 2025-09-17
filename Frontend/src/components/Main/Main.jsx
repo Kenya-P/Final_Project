@@ -1,7 +1,7 @@
 import "./Main.css";
 import React, { useMemo, useState } from "react";
 import PetCard from "../PetCard/PetCard.jsx";
-import FilterPanel from "../FiltersPanel/FiltersPanel.jsx";
+import FiltersPanel from "../FiltersPanel/FiltersPanel.jsx";
 
 export default function Main(props) {
   const {
@@ -36,7 +36,7 @@ export default function Main(props) {
     <main className="main">
       {/* Sidebar */}
       <aside className="main__sidebar">
-        <FilterPanel
+        <FiltersPanel
           // if your component supports a slide-out on mobile:
           isOpen={isFiltersOpen}
           onClose={(open) => setIsFiltersOpen(!!open && open !== false)}
@@ -78,7 +78,7 @@ export default function Main(props) {
           <p>No pets found. Try adjusting filters.</p>
         )}
 
-        <ul className="pet-grid">
+        <ul className="main__pet-grid">
           {(animals || []).map((pet) => (
             <PetCard
               key={pet.id ?? pet._id}
@@ -95,7 +95,7 @@ export default function Main(props) {
           <button className="main__pagination-btn" type="button" onClick={handlePrev} disabled={!canPrev || loading}>
             Prev
           </button>
-          <span className="pagination__status">
+          <span className="main__pagination-status">
             {pagination?.page ?? 1} / {pagination?.totalPages ?? 1}
           </span>
           <button className="main__pagination-btn" type="button" onClick={handleNext} disabled={!canNext || loading}>

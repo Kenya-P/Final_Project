@@ -38,7 +38,7 @@ function PetCard({
   };
 
   return (
-    <li className="pet-card" data-id={id}>
+    <article className="pet-card" data-id={id}>
       <a
         className="pet-card__img-wrap"
         href={url || "#"}
@@ -78,7 +78,7 @@ function PetCard({
           </button>
         )}
       </div>
-    </li>
+    </article>
   );
 }
 
