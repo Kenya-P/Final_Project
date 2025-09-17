@@ -8,6 +8,8 @@ const API_BASE = String(RAW_BASE).replace(/\/+$/, '');
 
 const API_PREFIX = import.meta?.env?.VITE_API_PREFIX ?? "/api";
 
+console.log("[PetFinderApi] using API base:", API_BASE || '(same origin)', "prefix:", API_PREFIX);
+
 // join base + path safely
 const join = (path = '') =>
   `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
