@@ -7,7 +7,7 @@ export default ({ mode }) => {
   const API_TARGET = env.VITE_API_BASE || "http://localhost:3001";
 
   return defineConfig({
-    plugins: [react({ jsxRuntime: "automatic" })],
+    plugins: [react()],
     base: mode === "production" ? "/Final_Project/" : "/",
     server: {
       port: 3000,
