@@ -1,18 +1,26 @@
 import { getCurrentUserId } from './auth';
 
-// Accept either name; prefer VITE_API_BASE
-const RAW_BASE =
-  import.meta?.env?.VITE_API_BASE ?? '';
+// --- PetFinder API base (production-safe) ---
+const PROD_BACKEND = 'https://final-project-backend-kenya.onrender.com';
 
-const API_BASE = String(RAW_BASE).replace(/\/+$/, '');
+const isGhPages   = /github\.io$/.test(location.hostname);
+const baseFromEnv = (import.meta.env?.VITE_API_BASE ?? '').trim();
 
-const API_PREFIX = import.meta?.env?.VITE_API_PREFIX ?? "/api";
+// If env is missing in the production build, fall back automatically on GitHub Pages.
+const API_BASE   = baseFromEnv || (isGhPages ? PROD_BACKEND : '');
+const API_PREFIX = (import.meta.env?.VITE_API_PREFIX ?? '/api').trim();
 
-console.log("[PetFinderApi] using API base:", API_BASE || '(same origin)', "prefix:", API_PREFIX);
+// join without duplicate slashes
+const join = (...parts) =>
+  parts
+    .filter(Boolean)
+    .map((p, i) => (i === 0 ? String(p).replace(/\/+$/, '') : String(p).replace(/^\/+/, '')))
+    .join('/');
 
-// join base + path safely
-const join = (path = '') =>
-  `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+console.log('[PetFinderApi] using API base:', API_BASE || '(same origin)', 'prefix:', API_PREFIX);
+
+// Build the full URL root ONCE
+const API_ROOT = API_BASE ? join(API_BASE, API_PREFIX) : API_PREFIX;
 
 // query-string helper
 const toQS = (params = {}) => {
@@ -45,12 +53,13 @@ async function assertOk(res) {
 }
 
 async function getJson(path, params = {}) {
-  const url = `${join(`${API_PREFIX}${path}`)}${toQS(params)}`;
+  // ✅ USE API_ROOT (not API_PREFIX) so production calls your Render backend
+  const url = `${join(API_ROOT, path)}${toQS(params)}`;
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { cache: 'no-store' });
     return await assertOk(res);
   } catch (e) {
-    console.error("[PetFinderApi] GET failed:", url, e.problem ?? e);
+    console.error('[PetFinderApi] GET failed:', url, e.problem ?? e);
     throw e;
   }
 }
@@ -96,26 +105,15 @@ export async function getPets(params = {}) {
 
 // ---- Likes (localStorage, per user) ----
 const LS_LIKES_PREFIX = 'pf_likes_';
-const likesKey = (uid) => `${LS_LIKES_PREFIX}${uid}`;
-const readJSON = (k, fb) => {
-  try {
-    const v = localStorage.getItem(k);
-    return v ? JSON.parse(v) : fb;
-  } catch {
-    return fb;
-  }
-};
-const writeJSON = (k, v) => localStorage.setItem(k, JSON.stringify(v ?? null));
-const getUserLikes = (uid) => readJSON(likesKey(uid), []);
-const saveUserLikes = (uid, a) => writeJSON(likesKey(uid), a);
+const likesKey        = (uid) => `${LS_LIKES_PREFIX}${uid}`;
+const readJSON        = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
+const writeJSON       = (k, v) => localStorage.setItem(k, JSON.stringify(v ?? null));
+const getUserLikes    = (uid) => readJSON(likesKey(uid), []);
+const saveUserLikes   = (uid, a) => writeJSON(likesKey(uid), a);
 
 export async function getUserPets() {
   const uid = getCurrentUserId();
-  if (!uid) {
-    const e = new Error('Unauthorized');
-    e.status = 401;
-    throw e;
-  }
+  if (!uid) { const e = new Error('Unauthorized'); e.status = 401; throw e; }
   const liked = new Set(getUserLikes(uid).map(String));
   const { animals } = await getPets({ page: 1, limit: 100 });
   return (animals ?? []).filter((a) => liked.has(String(a.id)));
@@ -123,11 +121,7 @@ export async function getUserPets() {
 
 export async function likePet(petId) {
   const uid = getCurrentUserId();
-  if (!uid) {
-    const e = new Error('Unauthorized');
-    e.status = 401;
-    throw e;
-  }
+  if (!uid) { const e = new Error('Unauthorized'); e.status = 401; throw e; }
   const likes = new Set(getUserLikes(uid).map(String));
   likes.add(String(petId));
   saveUserLikes(uid, Array.from(likes));
@@ -136,11 +130,7 @@ export async function likePet(petId) {
 
 export async function unlikePet(petId) {
   const uid = getCurrentUserId();
-  if (!uid) {
-    const e = new Error('Unauthorized');
-    e.status = 401;
-    throw e;
-  }
+  if (!uid) { const e = new Error('Unauthorized'); e.status = 401; throw e; }
   const likes = new Set(getUserLikes(uid).map(String));
   likes.delete(String(petId));
   saveUserLikes(uid, Array.from(likes));
