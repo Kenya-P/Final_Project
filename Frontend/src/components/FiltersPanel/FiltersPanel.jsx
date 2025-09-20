@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useId } from 'react';
+import React, { useId } from 'react';
 import './FiltersPanel.css';
 
 export default function FiltersPanel({
