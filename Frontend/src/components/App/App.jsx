@@ -26,10 +26,23 @@ export default function App() {
   const [loginError, setLoginError] = useState("");
   const [registerError, setRegisterError] = useState("");
 
+  const [selectedType, setSelectedType] = useState("");
+  const [gender, setGender] = useState("");
+  const [size, setSize] = useState("");
+  const [age, setAge] = useState("");
+  const [q, setQ] = useState("");
+  const [city, setCity] = useState("");
+  const [usState, setUsState] = useState("");
+  
   const [types, setTypes] = useState([]);
   const [animals, setAnimals] = useState([]);
+  const [pagination, setPagination] = useState(null);
 
   const [savedPets, setSavedPets] = useState([]);
+  const [isLoadingPets, setIsLoadingPets] = useState(false);
+  const [petsError, setPetsError] = useState("");
+
+  const [page, setPage] = useState(1);
 
   // ---------- Modal open/close (single source of truth) ----------
   const openLogin = () => { setIsRegisterOpen(false); setIsLoginOpen(true); };
@@ -40,6 +53,39 @@ export default function App() {
     setLoginError("");
     setRegisterError("");
   };
+
+  // ---------- Fetch animals ----------
+  const fetchAnimals = useCallback(async (pageToLoad) => {
+    setPetsError("");
+    setIsLoadingPets(true);
+    try {
+      const data = await getPets({ 
+        type: selectedType,
+        gender,
+        size,
+        age,
+        q,
+        city,
+        state: usState,
+        page: pageToLoad,
+        limit: 12,
+      });
+
+      const animalsArray = data?.animals ?? [];
+      const p = data?.pagination ?? {};
+
+      setAnimals(animalsArray);
+      setPagination({
+        page: p.current_page ?? p.page ?? pageToLoad ?? 1,
+        totalPages: p.total_pages ?? p.totalPages ?? 1,
+      });
+    setPage(p.current_page ?? p.page ?? pageToLoad ?? 1);
+    } catch (e) {
+      setPetsError("Sorry, something went wrong during the request. There may be a connection issue or the server may be down. Please try again later.");
+    } finally {
+      setIsLoadingPets(false);
+    }
+  }, [selectedType, gender, size, age, q, city, usState]);
 
   // ---------- Saved Pets helpers ----------
   const loadSavedPets = useCallback((userId) => {
@@ -70,13 +116,38 @@ export default function App() {
     });
   }, [currentUser?._id]);
 
+  const isPetSaved = useCallback(
+    (pet) => savedPets.some((p) => String(p.id) === String(pet?.id)),
+    [savedPets]
+  );
+
+  const onAuthRequired = useCallback(() => {
+    setIsRegisterOpen(false);
+    setIsLoginOpen(true);
+  }, []);
+
+  // pagination helpers
+  const canPrev = (pagination?.page ?? page) > 1;
+  const canNext = (pagination?.page ?? page) < (pagination?.totalPages ?? 1);
+
+  const loadPets = useCallback(({ direction } = {}) => {
+    const curr = pagination?.page ?? page;
+    const next =
+      direction === "next" ? curr + 1 :
+      direction === "prev" ? Math.max(1, curr - 1) :
+      curr;
+    setPage(next);
+    fetchAnimals(next);
+  }, [pagination?.page, page, fetchAnimals]);
+
+
   // helper: merge guest saved pets into a user’s list (dedup by id)
   const mergeGuestInto = useCallback((userId) => {
     if (!userId) return;
     try {
       const guest = loadSaved("guest") || [];
       const existing = loadSaved(userId) || [];
-      const byId = newMap();
+      const byId = new Map();
       [...existing, ...guest].forEach((p) => byId.set(String(p.id), p));
       const merged = Array.from(byId.values());
       saveSaved(userId, merged);
@@ -129,7 +200,7 @@ export default function App() {
     closeModals();
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     (async () => {
       try {
         const t = await getAnimalTypes();
@@ -146,7 +217,27 @@ export default function App() {
         console.error("[App] getPets failed:", e);
       }
     })();
+  }, []);*/
+
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        const t = await getAnimalTypes();
+        if (!ignore) setTypes(t?.types ?? []);
+      } catch (e) {
+        console.warn("[App] getAnimalTypes failed:", e);
+      }
+    })();
+    return () => { ignore = true; };
   }, []);
+
+
+  useEffect(()=> {
+    setPage(1);
+    fetchAnimals(1);
+  }, [selectedType, gender, size, age, q, city, usState, fetchAnimals]);
+
 
   // when user changes, reload their saved pets once
   useEffect(() => {
@@ -166,12 +257,51 @@ export default function App() {
         <Route
           path="/"
           element={
-            <Main
-              animals={animals}
-              types={types}
-              savedPets={savedPets}
-              onToggleLike={toggleLike}
-            />
+      <Main
+        /* data/options */
+        types={types}
+        animals={animals}
+        pagination={pagination}
+        genderOptions={["Male", "Female"]}
+        sizeOptions={["Small", "Medium", "Large"]}
+        ageOptions={["Baby", "Young", "Adult", "Senior"]}
+
+        /* selected values */
+        selectedType={selectedType}
+        gender={gender}
+        size={size}
+        age={age}
+        q={q}
+        city={city}
+        state={usState}
+
+        /* handlers */
+        onTypeChange={setSelectedType}
+        onGenderChange={setGender}
+        onSizeChange={setSize}
+        onAgeChange={setAge}
+        onQueryChange={setQ}
+        onCityChange={setCity}
+        onStateChange={setUsState}
+        clearFilters={() => {
+          setSelectedType(""); setGender(""); setSize("");
+          setAge(""); setQ(""); setCity(""); setUsState("");
+        }}
+
+        /* like/auth */
+        isPetSaved={isPetSaved}
+        toggleLike={toggleLike}
+        onAuthRequired={onAuthRequired}
+        isAuthenticated={!!currentUser}
+
+        /* status + paging */
+        isLoadingPets={isLoadingPets}
+        petsError={petsError}
+        canPrev={canPrev}
+        canNext={canNext}
+        loadPets={loadPets}
+      />
+
           }
         />
         <Route

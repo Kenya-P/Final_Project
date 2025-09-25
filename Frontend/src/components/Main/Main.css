@@ -36,7 +36,7 @@
   gap: 20px; 
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 16px auto 0;
 }
 
 .main__pagination {
@@ -59,6 +59,29 @@
   cursor: pointer;
 }
 
+.results__error {
+  margin: 24px 0;
+  color: #b00020;
+}
+
+.results__empty {
+  margin: 24px 0;
+  color: #333;
+}
+
+.show-more { 
+  display: block;
+  margin: 16px auto 0;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
+.show-more:hover { 
+  background: #fafafa;
+}
 
 /* Two-column layout on desktop: sidebar + content */
 .main__layout {

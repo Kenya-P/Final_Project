@@ -1,47 +1,93 @@
 import "./Main.css";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import PetCard from "../PetCard/PetCard.jsx";
 import FiltersPanel from "../FiltersPanel/FiltersPanel.jsx";
+import Preloader from "../Preloader/Preloader.jsx";
 
 export default function Main(props) {
   const {
     // data/options
-    types, animals, pagination, genderOptions, sizeOptions, ageOptions,
+    types,
+    animals = [],
+    pagination,
+    genderOptions,
+    sizeOptions,
+    ageOptions,
+
     // selected values + handlers
-    selectedType, gender, size, age, city, state, q,
-    onTypeChange, onGenderChange, onSizeChange, onAgeChange,
-    onCityChange, onStateChange, onQueryChange, clearFilters,
+    selectedType,
+    gender,
+    size,
+    age,
+    city,
+    state,
+    q,
+    onTypeChange,
+    onGenderChange,
+    onSizeChange,
+    onAgeChange,
+    onCityChange,
+    onStateChange,
+    onQueryChange,
+    clearFilters,
+
     // like/auth
-    isPetSaved, toggleLike, onAuthRequired = () => {}, isAuthenticated = false,
+    isPetSaved,
+    toggleLike,
+    onAuthRequired = () => {},
+    isAuthenticated = false,
+
     // status + paging
-    loading, error, canPrev, canNext, loadPets,
+    isLoadingPets,
+    petsError,
+    canPrev,
+    canNext,
+    loadPets,
   } = props;
 
   // (optional) mobile drawer state if your FilterPanel supports it
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
+  // ---- "Show only three" per rubric ----
+  const [visibleCount, setVisibleCount] = useState(3);
+  useEffect(() => { setVisibleCount(3); }, [animals]);
+  const visibleAnimals = useMemo(
+    () => animals.slice(0, visibleCount),
+    [animals, visibleCount]
+  );
+  const canShowMore = animals.length > visibleCount;
+
   // Normalize types: support ["Dog"] OR [{ name:"Dog" }]
   const typeNames = useMemo(
     () =>
       Array.from(
-        new Set((types ?? []).map(t => (typeof t === "string" ? t : t?.name)).filter(Boolean))
+        new Set(
+          (types ?? [])
+            .map((t) => (typeof t === "string" ? t : t?.name))
+            .filter(Boolean)
+        )
       ),
     [types]
   );
 
-  const handlePrev = () => { if (canPrev) loadPets?.({ direction: "prev" }); };
-  const handleNext = () => { if (canNext) loadPets?.({ direction: "next" }); };
+  const page = pagination?.current_page ?? pagination?.page ?? 1;
+  const totalPages = pagination?.total_pages ?? pagination?.totalPages ?? 1;
+
+  const handlePrev = () => {
+    if (canPrev) loadPets?.({ direction: "prev" });
+  };
+  
+  const handleNext = () => {
+    if (canNext) loadPets?.({ direction: "next" });
+  };
 
   return (
     <main className="main">
-      {/* Sidebar */}
       <aside className="main__sidebar">
         <FiltersPanel
-          // if your component supports a slide-out on mobile:
           isOpen={isFiltersOpen}
-          onClose={(open) => setIsFiltersOpen(!!open && open !== false)}
+          onClose={() => setIsFiltersOpen(false)}
 
-          // values
           selectedType={selectedType || ""}
           gender={gender || ""}
           size={size || ""}
@@ -50,13 +96,11 @@ export default function Main(props) {
           city={city || ""}
           state={state || ""}
 
-          // options
           typeNames={typeNames}
           genderOptions={genderOptions || []}
           sizeOptions={sizeOptions || []}
           ageOptions={ageOptions || []}
 
-          // handlers
           onTypeChange={onTypeChange}
           onGenderChange={onGenderChange}
           onSizeChange={onSizeChange}
@@ -70,35 +114,64 @@ export default function Main(props) {
 
       {/* Main content */}
       <section className="main__content">
-        {loading && <p>Loading pets…</p>}
-        {!loading && error && (
-          <p role="alert">Error: {String(error?.detail || error)}</p>
-        )}
-        {!loading && !error && (!animals || animals.length === 0) && (
-          <p>No pets found. Try adjusting filters.</p>
+        {isLoadingPets && <Preloader />}
+
+        {!isLoadingPets && petsError && (
+          <p className="results__error">
+            {petsError}
+          </p>
         )}
 
-        <ul className="main__pet-grid">
-          {(animals || []).map((pet) => (
-            <PetCard
-              key={pet.id ?? pet._id}
-              pet={pet}
-              isSaved={isPetSaved?.(pet)}
-              canSave={isAuthenticated}
-              onToggleSave={() => toggleLike?.(pet)}
-              onAuthRequired={onAuthRequired}
-            />
-          ))}
-        </ul>
+        {!isLoadingPets && !petsError && animals.length === 0 && (
+          <p className="results__empty">Nothing found</p>
+        )}
+
+        {!isLoadingPets && !petsError && animals.length > 0 && (
+          <>
+            <ul className="main__pet-grid">
+              {visibleAnimals.map((pet) => (
+                <li key={pet.id ?? pet._id}>
+                  <PetCard
+                    pet={pet}
+                    isSaved={isPetSaved?.(pet)}
+                    canSave={isAuthenticated}
+                    onToggleSave={() => toggleLike?.(pet)}
+                    onAuthRequired={onAuthRequired}
+                  />
+                </li>
+              ))}
+            </ul>
+
+            {canShowMore && (
+              <button
+                className="show-more"
+                type="button"
+                onClick={() => setVisibleCount((c) => c + 3)}
+              >
+                Show more
+              </button>
+            )}
+          </>
+        )}
 
         <div className="main__pagination">
-          <button className="main__pagination-btn" type="button" onClick={handlePrev} disabled={!canPrev || loading}>
+          <button
+            className="main__pagination-btn"
+            type="button"
+            onClick={handlePrev}
+            disabled={!canPrev || isLoadingPets}
+          >
             Prev
           </button>
           <span className="main__pagination-status">
-            {pagination?.page ?? 1} / {pagination?.totalPages ?? 1}
+            {page} / {totalPages}
           </span>
-          <button className="main__pagination-btn" type="button" onClick={handleNext} disabled={!canNext || loading}>
+          <button
+            className="main__pagination-btn"
+            type="button"
+            onClick={handleNext}
+            disabled={!canNext || isLoadingPets}
+          >
             Next
           </button>
         </div>
@@ -106,4 +179,3 @@ export default function Main(props) {
     </main>
   );
 }
-
