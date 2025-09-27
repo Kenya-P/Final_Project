@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import Header from "../Header/Header.jsx";
 import Main from "../Main/Main.jsx";
 import Profile from "../Profile/Profile.jsx";
+import Footer from "../Footer/Footer.jsx";
 
 import LoginModal from "../LoginModal/LoginModal.jsx";
 import RegisterModal from "../RegisterModal/RegisterModal.jsx";
@@ -324,6 +325,7 @@ export default function App() {
           }
         />
       </Routes>
+      <Footer />
 
       {/* Modals */}
       <LoginModal
