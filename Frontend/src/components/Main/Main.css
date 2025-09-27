@@ -47,7 +47,7 @@
 .main__pagination {
   margin-top: 16px;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 14px;
   color: #fff;
 }
 
@@ -59,9 +59,16 @@
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 1rem;
+  font-size: 16px;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.main__pagination-status {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #333;
+  padding: 5px;
 }
 
 .results__error {
