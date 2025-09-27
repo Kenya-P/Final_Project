@@ -38,28 +38,28 @@ function PetCard({
   };
 
   return (
-    <article className="pet-card" data-id={id}>
+    <article className="pet__card" data-id={id}>
       <a
-        className="pet-card__img-wrap"
+        className="pet__card-img-wrap"
         href={url || "#"}
         target={url ? "_blank" : undefined}
         rel={url ? "noreferrer" : undefined}
       >
         <img
-          className="pet-card__img"
+          className="pet__card-img"
           src={src}
           alt={name}
           onError={() => setSrc(PLACEHOLDER)}
         />
       </a>
 
-      <div className="pet-card__info">
-        <h3 className="pet-card__name">{name}</h3>
-        <p className="pet-card__line">{breed}</p>
-        <p className="pet-card__line">{age || "Age unknown"}</p>
+      <div className="pet__card-info">
+        <h3 className="pet__card-name">{name}</h3>
+        <p className="pet__card-line">{breed}</p>
+        <p className="pet__card-line">{age || "Age unknown"}</p>
       </div>
 
-      <div className="pet-card__actions">
+      <div className="pet__card-actions">
         <button
           type="button"
           className={`card__like-button ${liked ? "card__like-button_active" : ""}`}
@@ -68,15 +68,6 @@ function PetCard({
           aria-label={liked ? "Remove from saved" : "Save pet"}
           title={liked ? "Saved" : "Save"}
         />
-        {showRemove && (
-          <button
-            className="pet-card__remove"
-            onClick={onRemove}
-            aria-label="Remove from saved"
-          >
-            Remove
-          </button>
-        )}
       </div>
     </article>
   );

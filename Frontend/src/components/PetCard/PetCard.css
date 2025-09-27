@@ -1,4 +1,4 @@
-.pet-card { 
+.pet__card { 
   position: relative; 
   border-radius: 16px; 
   overflow: hidden; 
@@ -10,7 +10,7 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.pet-card__img { 
+.pet__card-img { 
   width: 100%; 
   height: auto;
   aspect-ratio: 4 /3;
@@ -18,39 +18,40 @@
   display: block; 
 }
 
-.pet-card__img-wrap {
+.pet__card-img-wrap {
   width: 100%;
   background: #f3f4f6;
   overflow: hidden;
 }
 
 
-.pet-card--compact .pet-card__img { 
+.pet__card--compact .pet__card-img { 
   height: 140px; 
 }
 
-.pet-card__info { 
+.pet__card-info { 
   padding: 10px 12px 12px; 
 }
 
-.pet-card__name { 
+.pet__card-name { 
   margin: 0 0 4px; 
   font-size: 1.05rem; 
 }
 
-.pet-card__line { 
+.pet__card-line { 
   margin: 2px 0; 
   color: #444; 
   font-size: 0.9rem; 
 }
 
-.pet-card__actions {
+.pet__card-actions {
   position: absolute;
   top: 8px;
   right: 8px;
   display: flex;
   gap: 6px;
   align-items: center;
+  border-style: none;
 }
 
 .card__like-button {
@@ -59,7 +60,7 @@
   margin: 0;
   width: 18px;
   height: 15px;
-  border: none;
+  border-style: none;  
   cursor: pointer;
 
   background: url('../../assets/images/like-button.svg') transparent no-repeat center center;
@@ -76,22 +77,11 @@
   transform: scale(0.9);
   background: url('../../assets/images/liked-button.svg') transparent no-repeat center center;
   background-size: contain;
+  border-style: none;
 }
 
-.card__like-button:focus-visible {
+/*.card__like-button:focus-visible {
   outline: 2px solid #2684ff;
   outline-offset: 2px;
 }
-
-
-.pet-card__remove {
-  height: 28px; 
-  padding: 0 10px; 
-  border-radius: 8px; 
-  border: 1px solid #d6d6d6; 
-  background: #fff; 
-  cursor: pointer;
-}
-.pet-card__remove:hover { 
-  background: #f7f7f7; 
-}
+*/

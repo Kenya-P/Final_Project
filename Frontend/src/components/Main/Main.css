@@ -13,15 +13,20 @@
   line-height: 1.2; 
 }
 
-.main__sidebar {
+.main__filtersbar {
   position: sticky;
-  top: 20px;
   align-self: flex-start;
-  overflow: auto;
   background: #fff;
-  border: 1px solid #e6e6e6;
-  border-radius: 16px;
-  padding: 16px;
+}
+
+.main__filtersbar-btn {
+  appearance: none;
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
 .main__content { 
@@ -90,10 +95,67 @@
   align-items: start;
 }
 
-/* Sidebar only visible â‰¥1024px */
-.main__sidebar { display: none; }
-@media (min-width: 1024px) {
-  .main__sidebar { display: block; }
+.filters__popover {
+  position: fixed;
+  top: 220px;
+  left: 220px;
+  width: 340px;
+  max-height: min(80vh,640px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 45px rgba(0,0,0,.18);
+  z-index: 31;
+  padding: 12px;
+}
+
+.filters__popover-overlay { 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(0,0,0,.28); 
+  z-index: 30;
+}
+
+.filters__popover-header { 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.filters__popover-close {
+  background: none; 
+  border: 0;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.filters__popover-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.filters__popover-clear {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.filters__popover-apply {
+  border: 0;
+  background: #111827;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+@media (max-width: 640px) {
+  .filters-popover { left:0; right:0; top:auto; bottom:0; width:100%; max-height:85vh;
+    border-bottom-left-radius:0; border-bottom-right-radius:0; }
 }
 
 /* Mobile dropdown trigger lives in content area; hide it on desktop */

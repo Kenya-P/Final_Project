@@ -13,13 +13,13 @@ export default function Profile({
   const has = Array.isArray(savedPets) && savedPets.length > 0;
 
   return (
-    <main className="content">
+    <main className="profile">
       <h2 className="profile__title">{title}</h2>
 
       {!has && <p>No saved pets yet.</p>}
 
       {has && (
-        <ul className="pet-grid">
+        <ul className="profile__grid">
           {savedPets.map((pet) => (
             <PetCard
               key={pet.id ?? pet._id}

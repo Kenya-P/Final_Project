@@ -48,6 +48,13 @@ export default function Main(props) {
   // (optional) mobile drawer state if your FilterPanel supports it
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
+  const activeCount = useMemo(() =>
+  [selectedType, gender, size, age, q, city, state]
+    .map(v => (typeof v === 'string' ? v.trim() : v))
+    .filter(Boolean).length
+, [selectedType, gender, size, age, q, city, state]);
+
+
   // ---- "Show only three" per rubric ----
   const [visibleCount, setVisibleCount] = useState(3);
   useEffect(() => { setVisibleCount(3); }, [animals]);
@@ -83,34 +90,57 @@ export default function Main(props) {
 
   return (
     <main className="main">
-      <aside className="main__sidebar">
-        <FiltersPanel
-          isOpen={isFiltersOpen}
-          onClose={() => setIsFiltersOpen(false)}
+      <div className="main__filtersbar">
+        <button
+          type="button"
+          className="main__filtersbar-btn"
+          aria-haspopup="dialog"
+          aria-expanded={isFiltersOpen}
+          onClick={() => setIsFiltersOpen(true)}
+        >
+          Filters{activeCount ? ` (${activeCount})` : ""}
+        </button>
+      </div>
 
-          selectedType={selectedType || ""}
-          gender={gender || ""}
-          size={size || ""}
-          age={age || ""}
-          q={q || ""}
-          city={city || ""}
-          state={state || ""}
+      {isFiltersOpen && (
+        <>
+          <div className="filters__popover-overlay" onClick={() => setIsFiltersOpen(false)} />
+          <div className="filters__popover" role="dialog" aria-modal="true" aria-label="Filters">
+            <div className="filters__popover-header">
+              <strong>Filters</strong>
+              <button className="filters__popover-close" type="button" onClick={() => setIsFiltersOpen(false)}>×</button>
+            </div>
 
-          typeNames={typeNames}
-          genderOptions={genderOptions || []}
-          sizeOptions={sizeOptions || []}
-          ageOptions={ageOptions || []}
+            <FiltersPanel
+              selectedType={selectedType || ""}
+              gender={gender || ""}
+              size={size || ""}
+              age={age || ""}
+              q={q || ""}
+              city={city || ""}
+              state={state || ""}
+              typeNames={typeNames}
+              genderOptions={genderOptions || []}
+              sizeOptions={sizeOptions || []}
+              ageOptions={ageOptions || []}
+              onTypeChange={onTypeChange}
+              onGenderChange={onGenderChange}
+              onSizeChange={onSizeChange}
+              onAgeChange={onAgeChange}
+              onQueryChange={onQueryChange}
+              onCityChange={onCityChange}
+              onStateChange={onStateChange}
+              onClear={clearFilters}
+              loading={isLoadingPets}
+            />
 
-          onTypeChange={onTypeChange}
-          onGenderChange={onGenderChange}
-          onSizeChange={onSizeChange}
-          onAgeChange={onAgeChange}
-          onQueryChange={onQueryChange}
-          onCityChange={onCityChange}
-          onStateChange={onStateChange}
-          onClear={clearFilters}
-        />
-      </aside>
+            <div className="filters__popover-actions">
+              <button className="filters__popover-clear" type="button" onClick={() => clearFilters?.()}>Clear</button>
+              <button className="filters__popover-apply" type="button" onClick={() => setIsFiltersOpen(false)}>Done</button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Main content */}
       <section className="main__content">
