@@ -224,13 +224,20 @@ export default function App() {
     (async () => {
       try {
         const t = await getAnimalTypes();
-        if (!ignore) setTypes(t?.types ?? []);
+        // Normalize to [{ name: "Cat" }, ...] no matter what backend/mock returns
+        const normalized = Array.from(
+          new Set((t?.types ?? [])
+            .map(x => (typeof x === "string" ? x : x?.name))
+            .filter(Boolean))
+        ).map(name => ({ name }));
+        if (!ignore) setTypes(normalized);
       } catch (e) {
         console.warn("[App] getAnimalTypes failed:", e);
       }
     })();
     return () => { ignore = true; };
   }, []);
+
 
 
   useEffect(()=> {

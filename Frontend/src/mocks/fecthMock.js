@@ -1,26 +1,25 @@
 import ANIMALS_FIXTURE from '../mocks/animal.json';
 
-function jsonResponse(obj, init = {}) {
+function json(obj, init = {}) {
   const headers = new Headers(init.headers || {});
   if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
   return new Response(JSON.stringify(obj), { status: init.status || 200, headers });
 }
 
 function filterAnimals(animals, params) {
-  const q = (params.get('q') || '').toLowerCase();
-  const type = (params.get('type') || '').toLowerCase();
-  const age = (params.get('age') || '').toLowerCase();
+  const q      = (params.get('q') || '').toLowerCase();
+  const type   = (params.get('type') || '').toLowerCase();
+  const age    = (params.get('age') || '').toLowerCase();
   const gender = (params.get('gender') || '').toLowerCase();
-  const size = (params.get('size') || '').toLowerCase();
+  const size   = (params.get('size') || '').toLowerCase();
 
   return animals.filter(a => {
-    const name = (a.name || '').toLowerCase();
-    const matchQ = !q || name.includes(q);
-    const matchType = !type || (a.type || '').toLowerCase() === type;
-    const matchAge = !age || (a.age || '').toLowerCase() === age;
-    const matchGender = !gender || (a.gender || '').toLowerCase() === gender;
-    const matchSize = !size || (a.size || '').toLowerCase() === size;
-    return matchQ && matchType && matchAge && matchGender && matchSize;
+    if (q && !(`${a.name || ''} ${(a.breeds?.primary || '')} ${(a.type || '')}`.toLowerCase().includes(q))) return false;
+    if (type && (a.type || '').toLowerCase() !== type) return false;
+    if (age && (a.age || '').toLowerCase() !== age) return false;
+    if (gender && (a.gender || '').toLowerCase() !== gender) return false;
+    if (size && (a.size || '').toLowerCase() !== size) return false;
+    return true;
   });
 }
 
@@ -32,24 +31,20 @@ export function setupMockApi() {
       const url = new URL(typeof input === 'string' ? input : input.url, window.location.origin);
       const method = (init.method || (typeof input !== 'string' ? input.method : '') || 'GET').toUpperCase();
 
-      // Gate: only handle our mock API
       if (!url.pathname.startsWith('/api/pf')) {
         return realFetch(input, init);
       }
 
       console.info('[mock] intercept', method, url.pathname, url.search);
 
-      // small latency
-      await new Promise(r => setTimeout(r, 80));
+      await new Promise(r => setTimeout(r, 60));
 
-      // GET /api/pf/types
       if (method === 'GET' && url.pathname === '/api/pf/types') {
         const types = ANIMALS_FIXTURE.types
           || Array.from(new Set((ANIMALS_FIXTURE.animals || []).map(a => a.type)));
-        return jsonResponse({ types });
+        return json({ types });
       }
 
-      // GET /api/pf/animals
       if (method === 'GET' && url.pathname === '/api/pf/animals') {
         const all = ANIMALS_FIXTURE.animals || [];
         const filtered = filterAnimals(all, url.searchParams);
@@ -66,16 +61,14 @@ export function setupMockApi() {
           total_pages: Math.max(1, Math.ceil(filtered.length / limit)),
         };
 
-        return jsonResponse({ animals: paged, pagination });
+        return json({ animals: paged, pagination });
       }
 
-      // Unhandled -> 404 with details
-      return jsonResponse({ error: 'Not Found', path: url.pathname }, { status: 404 });
+      return json({ error: 'Not Found', path: url.pathname }, { status: 404 });
 
     } catch (e) {
       console.error('[mock] fetch error', e);
-      const body = JSON.stringify({ error: 'Mock error', message: String(e?.message || e) });
-      return new Response(body, { status: 500, headers: { 'Content-Type': 'application/json' } });
+      return json({ error: 'Mock error', message: String(e?.message || e) }, { status: 500 });
     }
   };
 }

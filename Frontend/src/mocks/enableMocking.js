@@ -1,7 +1,7 @@
-if (import.meta.env.VITE_USE_MOCK === 'true') {
-  (async () => {
-    const m = await import('./fecthMock.js');
-    m.setupMockApi();
-    console.info('[mock] Mock API enabled');
-  })();
+import { setupMockApi } from "./fecthMock.js";
+
+if (import.meta.env.VITE_USE_MOCK === "true") {
+  setupMockApi();
+  window.__pfMockActive = true;
+  console.info("[mock] Mock API enabled (sync)");
 }

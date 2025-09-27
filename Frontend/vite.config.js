@@ -11,8 +11,7 @@ export default ({ mode }) => {
     base: mode === "production" ? "/Final_Project/" : "/",
     server: {
       port: 3000,
-      // Disable proxy entirely when mocking so nothing ever leaves the browser
-      proxy: USE_MOCK ? {} : {
+      proxy: (env.VITE_USE_MOCK === "true") ? {} : {
         "/api": { target: API_TARGET, changeOrigin: true },
         "/pf":  { target: API_TARGET, changeOrigin: true },
       },
