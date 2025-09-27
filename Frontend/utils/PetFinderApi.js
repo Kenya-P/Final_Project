@@ -1,10 +1,20 @@
 import { getCurrentUserId } from "./auth";
 
-const API_BASE   = (import.meta.env.VITE_API_BASE || '').trim();
+const FORCE_GHPAGES =
+  typeof location !== "undefined" && /github\.io$/.test(location.hostname);
+const USE_MOCK =
+  FORCE_GHPAGES || import.meta.env.VITE_USE_MOCK === "true";
+
+const API_BASE = USE_MOCK ? "" : (import.meta.env.VITE_API_BASE || "").trim();
 const API_PREFIX = (import.meta.env.VITE_API_PREFIX || '/api/pf').trim();
 
 function join(...parts) {
-  return parts.filter(Boolean).map((p,i)=> i===0 ? String(p).replace(/\/+$/, '') : String(p).replace(/^\/+/, '')).join('/');
+  return parts
+  .filter(Boolean)
+  .map((p,i)=> i===0 ? String(p)
+  .replace(/\/+$/, '') : String(p)
+  .replace(/^\/+/, ''))
+  .join('/');
 }
 
 function buildUrl(path, params = {}) {
