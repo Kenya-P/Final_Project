@@ -1,127 +1,67 @@
-import { getCurrentUserId } from './auth';
+import { getCurrentUserId } from "./auth";
 
-// --- PetFinder API base (production-safe) ---
-const PROD_BACKEND = 'https://final-project-backend-kenya.onrender.com';
+const API_BASE = (import.meta?.env?.VITE_API_BASE || "").trim();
+const API_PREFIX = (import.meta?.env?.VITE_API_PREFIX || "/api/pf").trim();
 
-const isGhPages   = /github\.io$/.test(location.hostname);
-const baseFromEnv = (import.meta.env?.VITE_API_BASE ?? '').trim();
-
-// If env is missing in the production build, fall back automatically on GitHub Pages.
-const API_BASE   = baseFromEnv || (isGhPages ? PROD_BACKEND : '');
-const API_PREFIX = (import.meta.env?.VITE_API_PREFIX ?? '/api').trim();
-
-// join without duplicate slashes
+// Join without duplicate slashes
 const join = (...parts) =>
   parts
     .filter(Boolean)
-    .map((p, i) => (i === 0 ? String(p).replace(/\/+$/, '') : String(p).replace(/^\/+/, '')))
-    .join('/');
+    .map((p, i) =>
+      i === 0 ? String(p).replace(/\/+$/, "") : String(p).replace(/^\/+/, "")
+    )
+    .join("/");
 
-console.log('[PetFinderApi] using API base:', API_BASE || '(same origin)', 'prefix:', API_PREFIX);
-
-// Build the full URL root ONCE
-const API_ROOT = API_BASE ? join(API_BASE, API_PREFIX) : API_PREFIX;
-
-// query-string helper
-const toQS = (params = {}) => {
-  const usp = new URLSearchParams();
+// Build a fully-qualified URL; works with or without API_BASE
+function buildUrl(path, params = {}) {
+  const root = API_BASE ? join(API_BASE, API_PREFIX) : API_PREFIX;
+  const url = new URL(join(root, path), window.location.origin);
   Object.entries(params).forEach(([k, v]) => {
-    if (v != null && String(v).trim() !== '') usp.set(k, v);
+    if (v != null && String(v).trim() !== "") url.searchParams.set(k, v);
   });
-  const qs = usp.toString();
-  return qs ? `?${qs}` : '';
-};
-
-// ---- helpers ----
-async function parseProblem(res) {
-  let text = await res.text().catch(() => '');
-  try {
-    return JSON.parse(text);
-  } catch {
-    return { status: res.status, title: res.statusText, detail: text };
-  }
+  return url.toString();
 }
 
-async function assertOk(res) {
+async function getJson(path, params = {}) {
+  const url = buildUrl(path, params);
+  // console.log("[PetFinderApi] GET", url);
+  const res = await fetch(url, { headers: { "Content-Type": "application/json" } });
   if (!res.ok) {
-    const prob = await parseProblem(res);
-    const err = new Error(prob.detail || prob.title || `HTTP ${res.status}`);
-    err.problem = prob;
-    throw err;
+    const text = await res.text().catch(() => "");
+    throw new Error(`HTTP ${res.status} ${res.statusText} – ${text}`);
   }
   return res.json();
 }
 
-async function getJson(path, params = {}) {
-  // ✅ USE API_ROOT (not API_PREFIX) so production calls your Render backend
-  const url = `${join(API_ROOT, path)}${toQS(params)}`;
-  try {
-    const res = await fetch(url, { cache: 'no-store' });
-    return await assertOk(res);
-  } catch (e) {
-    console.error('[PetFinderApi] GET failed:', url, e.problem ?? e);
-    throw e;
-  }
-}
-
-// ---- Petfinder passthroughs ----
+// -------- Public API (aligned with mocks in src/mocks/fecthMock.js) --------
 export async function getAnimalTypes() {
-  const data = await getJson('/types');
+  const data = await getJson("types");
   return { types: data.types ?? [] };
 }
 
 export async function getPets(params = {}) {
-  const data = await getJson('/animals', params);
-
-  const animals = (data.animals ?? []).map((a) => ({
-    id: a.id,
-    name: a.name,
-    description: a.description,
-    imageUrl:
-      a?.photos?.[0]?.medium ||
-      a?.primary_photo_cropped?.medium ||
-      '',
-    age: a.age,
-    gender: a.gender,
-    size: a.size,
-    breeds: a?.breeds?.primary || '',
-    url: a.url,
-    contact: a.contact,
-    published_at: a.published_at,
-    photos: a?.photos ?? [],
-  }));
-
-  return {
-    animals,
-    pagination:
-      data.pagination ?? {
-        current_page: 1,
-        total_pages: 1,
-        count_per_page: animals.length,
-        total_count: animals.length,
-      },
-  };
+  return getJson("animals", params);
 }
 
-// ---- Likes (localStorage, per user) ----
-const LS_LIKES_PREFIX = 'pf_likes_';
-const likesKey        = (uid) => `${LS_LIKES_PREFIX}${uid}`;
-const readJSON        = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
-const writeJSON       = (k, v) => localStorage.setItem(k, JSON.stringify(v ?? null));
-const getUserLikes    = (uid) => readJSON(likesKey(uid), []);
-const saveUserLikes   = (uid, a) => writeJSON(likesKey(uid), a);
+// -------- Likes (localStorage, per-user) --------
+const LS_LIKES_PREFIX = "pf_likes_";
+const likesKey  = (uid) => `${LS_LIKES_PREFIX}${uid}`;
+const readJSON  = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
+const writeJSON = (k, v) => localStorage.setItem(k, JSON.stringify(v ?? null));
+const getUserLikes  = (uid) => readJSON(likesKey(uid), []);
+const saveUserLikes = (uid, a) => writeJSON(likesKey(uid), a);
 
 export async function getUserPets() {
   const uid = getCurrentUserId();
-  if (!uid) { const e = new Error('Unauthorized'); e.status = 401; throw e; }
+  if (!uid) { const e = new Error("Unauthorized"); e.status = 401; throw e; }
   const liked = new Set(getUserLikes(uid).map(String));
   const { animals } = await getPets({ page: 1, limit: 100 });
-  return (animals ?? []).filter((a) => liked.has(String(a.id)));
+  return (animals ?? []).filter(a => liked.has(String(a.id)));
 }
 
 export async function likePet(petId) {
   const uid = getCurrentUserId();
-  if (!uid) { const e = new Error('Unauthorized'); e.status = 401; throw e; }
+  if (!uid) { const e = new Error("Unauthorized"); e.status = 401; throw e; }
   const likes = new Set(getUserLikes(uid).map(String));
   likes.add(String(petId));
   saveUserLikes(uid, Array.from(likes));
@@ -130,7 +70,7 @@ export async function likePet(petId) {
 
 export async function unlikePet(petId) {
   const uid = getCurrentUserId();
-  if (!uid) { const e = new Error('Unauthorized'); e.status = 401; throw e; }
+  if (!uid) { const e = new Error("Unauthorized"); e.status = 401; throw e; }
   const likes = new Set(getUserLikes(uid).map(String));
   likes.delete(String(petId));
   saveUserLikes(uid, Array.from(likes));
