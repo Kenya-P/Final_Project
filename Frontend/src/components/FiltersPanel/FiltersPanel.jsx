@@ -1,13 +1,18 @@
 import PropTypes from 'prop-types';
-import React, { useId } from 'react';
+import { useId } from 'react';
 import './FiltersPanel.css';
+import {
+  GENDER_OPTIONS,
+  SIZE_OPTIONS,
+  AGE_OPTIONS,
+} from '../../config/constants.js';
 
 export default function FiltersPanel({
   // data
-  types = [],
-  genderOptions = ['Male', 'Female', 'Unknown'],
-  sizeOptions = ['Small', 'Medium', 'Large', 'X-Large'],
-  ageOptions = ['Baby', 'Young', 'Adult', 'Senior'],
+  typeNames = [],
+  genderOptions = GENDER_OPTIONS,
+  sizeOptions = SIZE_OPTIONS,
+  ageOptions = AGE_OPTIONS,
   // selections
   selectedType = '',
   gender = '',
@@ -27,101 +32,150 @@ export default function FiltersPanel({
   onStateChange = () => {},
   onQueryChange = () => {},
   clearFilters = () => {},
-  onClose, // optional (used in mobile dropdown to close)
+  onClose,
 }) {
   const uid = useId();
-  const id = (name) => `${uid}-${name}`;
+  const makeId = (name) => `${uid}-${name}`;
+
+  // unique ids per control
+  const qId = makeId('q');
+  const typeId = makeId('type');
+  const genderId = makeId('gender');
+  const sizeId = makeId('size');
+  const ageId = makeId('age');
+  const cityId = makeId('city');
+  const stateId = makeId('state');
 
   const disableClear =
-    loading || (!selectedType && !gender && !size && !age && !city && !state && !q);
+    loading ||
+    [selectedType, gender, size, age, city, state, q]
+      .map((v) => (typeof v === 'string' ? v.trim() : v))
+      .every((v) => !v);
 
   return (
-    <form className="filters">
+    <form className="filters" onSubmit={(e) => e.preventDefault()}>
       <div className="filters__group">
-        <label className="filters__label" htmlFor="f-q">Search</label>
+        <label className="filters__label" htmlFor={qId}>
+          Search
+        </label>
         <input
-          id="f-q"
+          id={qId}
           className="filters__input"
           type="search"
           value={q}
           onChange={(e) => onQueryChange(e.target.value)}
           placeholder="Name, breed, type..."
+          disabled={loading}
         />
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor="f-type">Type</label>
+        <label className="filters__label" htmlFor={typeId}>
+          Type
+        </label>
         <select
-          id="f-type"
+          id={typeId}
           className="filters__input"
           value={selectedType}
           onChange={(e) => onTypeChange(e.target.value)}
+          disabled={loading}
         >
           <option value="">All</option>
-          {types.map((t) => <option key={t.name} value={t.name}>{t.name}</option>)}
+          {typeNames.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor="f-gender">Gender</label>
+        <label className="filters__label" htmlFor={genderId}>
+          Gender
+        </label>
         <select
-          id="f-gender"
+          id={genderId}
           className="filters__input"
           value={gender}
           onChange={(e) => onGenderChange(e.target.value)}
+          disabled={loading}
         >
           <option value="">Any</option>
-          {genderOptions.map((g) => <option key={g} value={g}>{g}</option>)}
+          {genderOptions.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor="f-size">Size</label>
+        <label className="filters__label" htmlFor={sizeId}>
+          Size
+        </label>
         <select
-          id="f-size"
+          id={sizeId}
           className="filters__input"
           value={size}
           onChange={(e) => onSizeChange(e.target.value)}
+          disabled={loading}
         >
           <option value="">Any</option>
-          {sizeOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+          {sizeOptions.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor="f-age">Age</label>
+        <label className="filters__label" htmlFor={ageId}>
+          Age
+        </label>
         <select
-          id="f-age"
+          id={ageId}
           className="filters__input"
           value={age}
           onChange={(e) => onAgeChange(e.target.value)}
+          disabled={loading}
         >
           <option value="">Any</option>
-          {ageOptions.map((a) => <option key={a} value={a}>{a}</option>)}
+          {ageOptions.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor="f-city">City</label>
+        <label className="filters__label" htmlFor={cityId}>
+          City
+        </label>
         <input
-          id="f-city"
+          id={cityId}
           className="filters__input"
           type="text"
           value={city}
           onChange={(e) => onCityChange(e.target.value)}
           placeholder="e.g., Jersey City"
+          disabled={loading}
         />
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor="f-state">State</label>
+        <label className="filters__label" htmlFor={stateId}>
+          State
+        </label>
         <input
-          id="f-state"
+          id={stateId}
           className="filters__input"
           type="text"
           value={state}
           onChange={(e) => onStateChange(e.target.value)}
           placeholder="e.g., NJ"
+          disabled={loading}
         />
       </div>
 
@@ -146,10 +200,11 @@ export default function FiltersPanel({
 }
 
 FiltersPanel.propTypes = {
-  types: PropTypes.array,
-  genderOptions: PropTypes.array,
-  sizeOptions: PropTypes.array,
-  ageOptions: PropTypes.array,
+  typeNames: PropTypes.arrayOf(PropTypes.string),
+  genderOptions: PropTypes.arrayOf(PropTypes.string),
+  sizeOptions: PropTypes.arrayOf(PropTypes.string),
+  ageOptions: PropTypes.arrayOf(PropTypes.string),
+
   selectedType: PropTypes.string,
   gender: PropTypes.string,
   size: PropTypes.string,
@@ -157,7 +212,9 @@ FiltersPanel.propTypes = {
   city: PropTypes.string,
   state: PropTypes.string,
   q: PropTypes.string,
+
   loading: PropTypes.bool,
+
   onTypeChange: PropTypes.func,
   onGenderChange: PropTypes.func,
   onSizeChange: PropTypes.func,

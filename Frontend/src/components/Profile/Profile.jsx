@@ -1,12 +1,11 @@
-import React from "react";
-import PropTypes from "prop-types";
-import PetCard from "../PetCard/PetCard.jsx";
-import "./Profile.css";
+import PropTypes from 'prop-types';
+import PetCard from '../PetCard/PetCard.jsx';
+import './Profile.css';
 
 export default function Profile({
   savedPets = [],
   toggleLike = () => {},
-  title = "Your Saved Pets",
+  title = 'Your Saved Pets',
   isAuthenticated = true,
   onAuthRequired = () => {},
 }) {
@@ -27,7 +26,6 @@ export default function Profile({
               isSaved={true}
               canSave={isAuthenticated}
               onToggleSave={() => toggleLike(pet)}
-              showRemove
               onRemove={() => toggleLike(pet)}
               onAuthRequired={onAuthRequired}
             />

@@ -1,34 +1,35 @@
-import React, { useEffect } from "react";
-import PropTypes from "prop-types";
-import ModalWithForm from "../ModalWithForm/ModalWithForm";
-import { useFormAndValidation } from "../../../utils/useFormAndValidation.js";
-import "./RegisterModal.css";
+import { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import ModalWithForm from '../ModalWithForm/ModalWithForm';
+import { useFormAndValidation } from '../../../utils/useFormAndValidation.js';
+import { REGISTER_INITIAL } from '../../config/constants.js';
+import './RegisterModal.css';
 
-export default function RegisterModal({ isOpen, onClose, onRegister, isLoading, onClickLogin, errorText }) {
-  const { values, handleChange, setValues, errors, isValid, resetForm } = useFormAndValidation({
-    name: "",
-    avatar: "",
-    email: "",
-    password: "",
-  });
+export default function RegisterModal({
+  isOpen,
+  onClose,
+  onRegister,
+  isLoading,
+  onClickLogin,
+  errorText,
+}) {
+  const { values, handleChange, setValues, errors, isValid, resetForm } =
+    useFormAndValidation(REGISTER_INITIAL);
 
   // Reset only when opened to avoid render loops
   useEffect(() => {
-    if (isOpen) {
-      setValues({ name: "", avatar: "", email: "", password: "" });
-      resetForm({ name: "", avatar: "", email: "", password: "" }, {}, false);
-    }
-  }, [isOpen]);
-
+    if (!isOpen) return;
+    resetForm(REGISTER_INITIAL, {}, false);
+  }, [isOpen, resetForm]);
 
   const submit = (e) => {
     e.preventDefault();
     if (!isValid) return;
     onRegister?.({
-      name: values.name,
-      avatar: values.avatar,
-      email: values.email,
-      password: values.password,
+      name: values.name || '',
+      avatar: values.avatar || '',
+      email: values.email || '',
+      password: values.password || '',
     });
   };
 
@@ -40,11 +41,20 @@ export default function RegisterModal({ isOpen, onClose, onRegister, isLoading, 
       onClose={onClose}
       onSubmit={submit}
       title="Sign up"
-      subText={<span>or <button type="button" className="auth-link" onClick={onClickLogin}>Sign in</button></span>}
-      buttonText={isLoading ? "Creating…" : "Create account"}
+      subText={
+        <span>
+          or{' '}
+          <button type="button" className="auth-link" onClick={onClickLogin}>
+            Sign in
+          </button>
+        </span>
+      }
+      buttonText={isLoading ? 'Creating…' : 'Create account'}
       disabled={!isValid || isLoading}
     >
-      <label className="modal__label" htmlFor="reg-name">Name</label>
+      <label className="modal__label" htmlFor="reg-name">
+        Name
+      </label>
       <input
         id="reg-name"
         name="name"
@@ -55,11 +65,13 @@ export default function RegisterModal({ isOpen, onClose, onRegister, isLoading, 
         maxLength="30"
         required
         onChange={handleChange}
-        value={values.name || ""}
+        value={values.name || ''}
       />
       <span className="modal__input-error">{errors.name}</span>
 
-      <label className="modal__label" htmlFor="reg-avatar">Avatar URL (optional)</label>
+      <label className="modal__label" htmlFor="reg-avatar">
+        Avatar URL (optional)
+      </label>
       <input
         id="reg-avatar"
         name="avatar"
@@ -67,11 +79,13 @@ export default function RegisterModal({ isOpen, onClose, onRegister, isLoading, 
         className="modal__input auth-input"
         placeholder="https://…"
         onChange={handleChange}
-        value={values.avatar || ""}
+        value={values.avatar || ''}
       />
       <span className="modal__input-error">{errors.avatar}</span>
 
-      <label className="modal__label" htmlFor="reg-email">Email</label>
+      <label className="modal__label" htmlFor="reg-email">
+        Email
+      </label>
       <input
         id="reg-email"
         name="email"
@@ -80,11 +94,13 @@ export default function RegisterModal({ isOpen, onClose, onRegister, isLoading, 
         placeholder="you@example.com"
         required
         onChange={handleChange}
-        value={values.email || ""}
+        value={values.email || ''}
       />
       <span className="modal__input-error">{errors.email}</span>
 
-      <label className="modal__label" htmlFor="reg-password">Password</label>
+      <label className="modal__label" htmlFor="reg-password">
+        Password
+      </label>
       <input
         id="reg-password"
         name="password"
@@ -96,11 +112,15 @@ export default function RegisterModal({ isOpen, onClose, onRegister, isLoading, 
         required
         autoComplete="off"
         onChange={handleChange}
-        value={values.password || ""}
+        value={values.password || ''}
       />
       <span className="modal__input-error">{errors.password}</span>
 
-      {errorText && <p role="alert" className="auth-error">{errorText}</p>}
+      {errorText && (
+        <p role="alert" className="auth-error">
+          {errorText}
+        </p>
+      )}
     </ModalWithForm>
   );
 }

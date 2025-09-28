@@ -4,9 +4,16 @@
   gap: 12px;
 }
 
-.filters__group { display: flex; flex-direction: column; gap: 6px; }
+.filters__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-.filters__label { font-size: .9rem; color: #444; }
+.filters__label {
+  font-size: 0.9rem;
+  color: #444;
+}
 
 .filters__input {
   height: 38px;
@@ -16,19 +23,30 @@
   background: #fff;
 }
 
-.filters__actions { display: flex; gap: 8px; margin-top: 4px; }
-.filters__btn {
-  height: 36px; padding: 0 14px;
-  border-radius: 10px; border: 1px solid #d6d6d6;
-  background: #f7f7f7; cursor: pointer;
+.filters__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
 }
-.filters__btn:hover { background: #efefef; }
-.filters__btn--ghost { background: transparent; }
+.filters__btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #d6d6d6;
+  background: #f7f7f7;
+  cursor: pointer;
+}
+.filters__btn:hover {
+  background: #efefef;
+}
+.filters__btn--ghost {
+  background: transparent;
+}
 
 /* Sticky on desktop so it stays visible while scrolling cards */
 @media (min-width: 1024px) {
   .filters {
     position: sticky;
-    top: 72px;           /* header height + spacing */
+    top: 72px; /* header height + spacing */
   }
 }

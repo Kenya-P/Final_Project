@@ -1,12 +1,11 @@
-import PropTypes from "prop-types";
-import React from "react";
-import { Navigate } from "react-router-dom";
+import PropTypes from 'prop-types';
+import { Navigate } from 'react-router-dom';
 
 export default function ProtectedRoute({
   isLoggedIn,
   element,
   children,
-  redirectTo = "/",
+  redirectTo = '/',
 }) {
   if (!isLoggedIn) return <Navigate to={redirectTo} replace />;
   return element ?? children ?? null;

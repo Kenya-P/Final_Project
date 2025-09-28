@@ -1,6 +1,6 @@
-const keyFor = (userId = "guest") => `ppf:saved:${userId}`;
+const keyFor = (userId = 'guest') => `ppf:saved:${userId}`;
 
-export function loadSaved(userId = "guest") {
+export function loadSaved(userId = 'guest') {
   try {
     const raw = localStorage.getItem(keyFor(userId));
     return raw ? JSON.parse(raw) : [];
@@ -9,8 +9,10 @@ export function loadSaved(userId = "guest") {
   }
 }
 
-export function saveSaved(userId = "guest", items = []) {
+export function saveSaved(userId = 'guest', items = []) {
   try {
     localStorage.setItem(keyFor(userId), JSON.stringify(items));
-  } catch {}
+  } catch {
+    // ignore write errors
+  }
 }

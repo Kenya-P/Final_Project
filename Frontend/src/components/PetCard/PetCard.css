@@ -1,21 +1,23 @@
-.pet__card { 
-  position: relative; 
-  border-radius: 16px; 
-  overflow: hidden; 
-  background: #fff; 
+.pet__card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
   list-style: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.pet__card-img { 
-  width: 100%; 
+.pet__card-img {
+  width: 100%;
   height: auto;
   aspect-ratio: 4 /3;
-  object-fit: cover; 
-  display: block; 
+  object-fit: cover;
+  display: block;
 }
 
 .pet__card-img-wrap {
@@ -24,24 +26,19 @@
   overflow: hidden;
 }
 
-
-.pet__card--compact .pet__card-img { 
-  height: 140px; 
+.pet__card-info {
+  padding: 10px 12px 12px;
 }
 
-.pet__card-info { 
-  padding: 10px 12px 12px; 
+.pet__card-name {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
 }
 
-.pet__card-name { 
-  margin: 0 0 4px; 
-  font-size: 1.05rem; 
-}
-
-.pet__card-line { 
-  margin: 2px 0; 
-  color: #444; 
-  font-size: 0.9rem; 
+.pet__card-line {
+  margin: 2px 0;
+  color: #444;
+  font-size: 0.9rem;
 }
 
 .pet__card-actions {
@@ -60,13 +57,16 @@
   margin: 0;
   width: 18px;
   height: 15px;
-  border-style: none;  
+  border-style: none;
   cursor: pointer;
 
-  background: url('../../assets/images/like-button.svg') transparent no-repeat center center;
+  background: url('../../assets/images/like-button.svg') transparent no-repeat
+    center center;
   background-size: contain;
 
-  transition: opacity .15s ease, transform .12s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.12s ease;
 }
 
 .card__like-button:hover {
@@ -75,13 +75,8 @@
 
 .card__like-button_active {
   transform: scale(0.9);
-  background: url('../../assets/images/liked-button.svg') transparent no-repeat center center;
+  background: url('../../assets/images/liked-button.svg') transparent no-repeat
+    center center;
   background-size: contain;
   border-style: none;
 }
-
-/*.card__like-button:focus-visible {
-  outline: 2px solid #2684ff;
-  outline-offset: 2px;
-}
-*/

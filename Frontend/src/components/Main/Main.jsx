@@ -1,13 +1,14 @@
-import "./Main.css";
-import { useMemo, useState, useEffect } from "react";
-import PetCard from "../PetCard/PetCard.jsx";
-import FiltersPanel from "../FiltersPanel/FiltersPanel.jsx";
-import Preloader from "../Preloader/Preloader.jsx";
+import './Main.css';
+import { useMemo, useState, useEffect } from 'react';
+import PetCard from '../PetCard/PetCard.jsx';
+import FiltersPanel from '../FiltersPanel/FiltersPanel.jsx';
+import Preloader from '../Preloader/Preloader.jsx';
+import PropTypes from 'prop-types';
 
 export default function Main(props) {
   const {
     // data/options
-    types,
+    types = [],
     animals = [],
     pagination,
     genderOptions,
@@ -48,16 +49,19 @@ export default function Main(props) {
   // (optional) mobile drawer state if your FilterPanel supports it
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  const activeCount = useMemo(() =>
-  [selectedType, gender, size, age, q, city, state]
-    .map(v => (typeof v === 'string' ? v.trim() : v))
-    .filter(Boolean).length
-, [selectedType, gender, size, age, q, city, state]);
-
+  const activeCount = useMemo(
+    () =>
+      [selectedType, gender, size, age, q, city, state]
+        .map((v) => (typeof v === 'string' ? v.trim() : v))
+        .filter(Boolean).length,
+    [selectedType, gender, size, age, q, city, state]
+  );
 
   // ---- "Show only three" per rubric ----
   const [visibleCount, setVisibleCount] = useState(3);
-  useEffect(() => { setVisibleCount(3); }, [animals]);
+  useEffect(() => {
+    setVisibleCount(3);
+  }, [animals]);
   const visibleAnimals = useMemo(
     () => animals.slice(0, visibleCount),
     [animals, visibleCount]
@@ -65,28 +69,25 @@ export default function Main(props) {
   const canShowMore = animals.length > visibleCount;
 
   // Normalize types: support ["Dog"] OR [{ name:"Dog" }]
-  const typeNames = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          (types ?? [])
-            .map((t) => (typeof t === "string" ? t : t?.name))
-            .filter(Boolean)
-        )
-      ),
-    [types]
-  );
+  const typeNames = Array.isArray(types)
+    ? types.map((t) => (typeof t === 'string' ? t : t?.name)).filter(Boolean)
+    : [];
 
   const page = pagination?.current_page ?? pagination?.page ?? 1;
   const totalPages = pagination?.total_pages ?? pagination?.totalPages ?? 1;
 
   const handlePrev = () => {
-    if (canPrev) loadPets?.({ direction: "prev" });
+    if (canPrev) loadPets?.({ direction: 'prev' });
   };
-  
+
   const handleNext = () => {
-    if (canNext) loadPets?.({ direction: "next" });
+    if (canNext) loadPets?.({ direction: 'next' });
   };
+
+  const errorText =
+    typeof petsError === 'string'
+      ? petsError
+      : petsError?.message || petsError?.detail || 'Something went wrong';
 
   return (
     <main className="main">
@@ -98,27 +99,41 @@ export default function Main(props) {
           aria-expanded={isFiltersOpen}
           onClick={() => setIsFiltersOpen(true)}
         >
-          Filters{activeCount ? ` (${activeCount})` : ""}
+          Filters{activeCount ? ` (${activeCount})` : ''}
         </button>
       </div>
 
       {isFiltersOpen && (
         <>
-          <div className="filters__popover-overlay" onClick={() => setIsFiltersOpen(false)} />
-          <div className="filters__popover" role="dialog" aria-modal="true" aria-label="Filters">
+          <div
+            className="filters__popover-overlay"
+            onClick={() => setIsFiltersOpen(false)}
+          />
+          <div
+            className="filters__popover"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Filters"
+          >
             <div className="filters__popover-header">
               <strong>Filters</strong>
-              <button className="filters__popover-close" type="button" onClick={() => setIsFiltersOpen(false)}>×</button>
+              <button
+                className="filters__popover-close"
+                type="button"
+                onClick={() => setIsFiltersOpen(false)}
+              >
+                ×
+              </button>
             </div>
 
             <FiltersPanel
-              selectedType={selectedType || ""}
-              gender={gender || ""}
-              size={size || ""}
-              age={age || ""}
-              q={q || ""}
-              city={city || ""}
-              state={state || ""}
+              selectedType={selectedType || ''}
+              gender={gender || ''}
+              size={size || ''}
+              age={age || ''}
+              q={q || ''}
+              city={city || ''}
+              state={state || ''}
               typeNames={typeNames}
               genderOptions={genderOptions || []}
               sizeOptions={sizeOptions || []}
@@ -130,14 +145,10 @@ export default function Main(props) {
               onQueryChange={onQueryChange}
               onCityChange={onCityChange}
               onStateChange={onStateChange}
-              onClear={clearFilters}
+              clearFilters={clearFilters}
+              onClose={() => setIsFiltersOpen(false)}
               loading={isLoadingPets}
             />
-
-            <div className="filters__popover-actions">
-              <button className="filters__popover-clear" type="button" onClick={() => clearFilters?.()}>Clear</button>
-              <button className="filters__popover-apply" type="button" onClick={() => setIsFiltersOpen(false)}>Done</button>
-            </div>
           </div>
         </>
       )}
@@ -147,9 +158,7 @@ export default function Main(props) {
         {isLoadingPets && <Preloader />}
 
         {!isLoadingPets && petsError && (
-          <p className="results__error">
-            {petsError}
-          </p>
+          <p className="results__error">{errorText}</p>
         )}
 
         {!isLoadingPets && !petsError && animals.length === 0 && (
@@ -209,3 +218,71 @@ export default function Main(props) {
     </main>
   );
 }
+
+Main.propTypes = {
+  // data/options
+  types: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({ name: PropTypes.string.isRequired }),
+    ])
+  ),
+  animals: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
+        name: PropTypes.string,
+        photos: PropTypes.array,
+      }),
+      PropTypes.shape({
+        _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
+        name: PropTypes.string,
+        photos: PropTypes.array,
+      }),
+    ])
+  ),
+  pagination: PropTypes.shape({
+    current_page: PropTypes.number,
+    total_pages: PropTypes.number,
+    page: PropTypes.number,
+    totalPages: PropTypes.number,
+    has_next: PropTypes.bool,
+    has_prev: PropTypes.bool,
+  }),
+  genderOptions: PropTypes.arrayOf(PropTypes.string),
+  sizeOptions: PropTypes.arrayOf(PropTypes.string),
+  ageOptions: PropTypes.arrayOf(PropTypes.string),
+
+  // selected values + handlers
+  selectedType: PropTypes.string,
+  gender: PropTypes.string,
+  size: PropTypes.string,
+  age: PropTypes.string,
+  city: PropTypes.string,
+  state: PropTypes.string,
+  q: PropTypes.string,
+
+  onTypeChange: PropTypes.func,
+  onGenderChange: PropTypes.func,
+  onSizeChange: PropTypes.func,
+  onAgeChange: PropTypes.func,
+  onCityChange: PropTypes.func,
+  onStateChange: PropTypes.func,
+  onQueryChange: PropTypes.func,
+  clearFilters: PropTypes.func,
+
+  // like/auth
+  isPetSaved: PropTypes.func,
+  toggleLike: PropTypes.func,
+  onAuthRequired: PropTypes.func,
+  isAuthenticated: PropTypes.bool,
+
+  // status + paging
+  isLoadingPets: PropTypes.bool,
+  petsError: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  canPrev: PropTypes.bool,
+  canNext: PropTypes.bool,
+  loadPets: PropTypes.func,
+};

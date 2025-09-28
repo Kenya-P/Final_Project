@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { getAnimalTypes, getPets, getUserPets, likePet, unlikePet } from '../../utils/PetFinderApi.js';
+import {
+  getAnimalTypes,
+  getPets,
+  getUserPets,
+  likePet,
+  unlikePet,
+} from '../../utils/PetFinderApi.js';
 
 // These mirror Petfinder's common values;
 const AGE_OPTIONS = ['Baby', 'Young', 'Adult', 'Senior'];
@@ -29,7 +35,10 @@ export default function usePetSearch(initial = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [pagination, setPagination] = useState({
-    count_per_page: limit, total_count: 0, current_page: 1, total_pages: 1
+    count_per_page: limit,
+    total_count: 0,
+    current_page: 1,
+    total_pages: 1,
   });
 
   // --- types
@@ -41,7 +50,9 @@ export default function usePetSearch(initial = {}) {
 
   // options derived from type (Petfinder spec)
   const genderOptions = useMemo(() => {
-    const t = types.find((x) => String(x.name).toLowerCase() === String(selectedType).toLowerCase());
+    const t = types.find(
+      (x) => String(x.name).toLowerCase() === String(selectedType).toLowerCase()
+    );
     return t?.genders || ['Male', 'Female', 'Unknown'];
   }, [types, selectedType]);
 
@@ -49,47 +60,50 @@ export default function usePetSearch(initial = {}) {
   const ageOptions = AGE_OPTIONS;
 
   // --- core loader
-  const loadPets = useCallback((overrides = {}) => {
-    setLoading(true);
-    setError('');
+  const loadPets = useCallback(
+    (overrides = {}) => {
+      setLoading(true);
+      setError('');
 
-    const params = {
-      type: selectedType || undefined,
-      gender: gender || undefined,
-      size: size || undefined,
-      age: age || undefined,
-      city: city || undefined,
-      state: state || undefined,
-      q: q || undefined,
-      page,
-      limit,
-      sort,
-      ...overrides,
-    };
+      const params = {
+        type: selectedType || undefined,
+        gender: gender || undefined,
+        size: size || undefined,
+        age: age || undefined,
+        city: city || undefined,
+        state: state || undefined,
+        q: q || undefined,
+        page,
+        limit,
+        sort,
+        ...overrides,
+      };
 
-    return getPets(params)
-      .then(({ animals = [], pagination = {} }) => {
-        setAnimals(animals);
-        setPagination(pagination);
+      return getPets(params)
+        .then(({ animals = [], pagination = {} }) => {
+          setAnimals(animals);
+          setPagination(pagination);
 
-        // sync state if the caller supplied overrides
-        if (overrides.page !== undefined) setPage(overrides.page);
-        if (overrides.limit !== undefined) setLimit(overrides.limit);
-        if (overrides.sort !== undefined) setSort(overrides.sort);
-        if (overrides.type !== undefined) setSelectedType(overrides.type);
-        if (overrides.gender !== undefined) setGender(overrides.gender);
-        if (overrides.size !== undefined) setSize(overrides.size);
-        if (overrides.age !== undefined) setAge(overrides.age);
-        if (overrides.city !== undefined) setCity(overrides.city);
-        if (overrides.state !== undefined) setState(overrides.state);
-        if (overrides.q !== undefined) setQ(overrides.q);
-      })
-      .catch((e) => setError(e?.message || 'Failed to load pets'))
-      .finally(() => setLoading(false));
-  }, [selectedType, gender, size, age, city, state, q, page, limit, sort]);
+          // sync state if the caller supplied overrides
+          if (overrides.page !== undefined) setPage(overrides.page);
+          if (overrides.limit !== undefined) setLimit(overrides.limit);
+          if (overrides.sort !== undefined) setSort(overrides.sort);
+          if (overrides.type !== undefined) setSelectedType(overrides.type);
+          if (overrides.gender !== undefined) setGender(overrides.gender);
+          if (overrides.size !== undefined) setSize(overrides.size);
+          if (overrides.age !== undefined) setAge(overrides.age);
+          if (overrides.city !== undefined) setCity(overrides.city);
+          if (overrides.state !== undefined) setState(overrides.state);
+          if (overrides.q !== undefined) setQ(overrides.q);
+        })
+        .catch((e) => setError(e?.message || 'Failed to load pets'))
+        .finally(() => setLoading(false));
+    },
+    [selectedType, gender, size, age, city, state, q, page, limit, sort]
+  );
 
   // --- saved pets API
- const loadSavedPets = useCallback(() => {
+  const loadSavedPets = useCallback(() => {
     return getUserPets()
       .then(({ animals = [] }) => setSavedPets(animals))
       .catch(() => setSavedPets([]));
@@ -100,50 +114,85 @@ export default function usePetSearch(initial = {}) {
     [savedPets]
   );
 
-  const toggleLike = useCallback(async (pet) => {
-    const id = pet?.id;
-    if (!id) return;
-    try {
-      if (isPetSaved(id)) {
-        await unlikePet(id);
-      } else {
-        await likePet(id);
+  const toggleLike = useCallback(
+    async (pet) => {
+      const id = pet?.id;
+      if (!id) return;
+      try {
+        if (isPetSaved(id)) {
+          await unlikePet(id);
+        } else {
+          await likePet(id);
+        }
+        // Refresh saved list
+        await loadSavedPets();
+      } catch (e) {
+        // swallow; UI can show toast if you implement one
       }
-      // Refresh saved list
-      await loadSavedPets();
-    } catch (e) {
-      // swallow; UI can show toast if you implement one
-    }
-  }, [isPetSaved, loadSavedPets]);
+    },
+    [isPetSaved, loadSavedPets]
+  );
 
   // --- filter handlers
-  const onTypeChange = useCallback((typeName) => {
-    const nextType = typeName || '';
-    const t = types.find((x) => String(x.name).toLowerCase() === String(nextType).toLowerCase());
-    const allowed = t?.genders || ['Male', 'Female', 'Unknown'];
-    const nextGender = allowed.includes(gender) ? gender : '';
-    return loadPets({ type: nextType, gender: nextGender, page: 1 });
-  }, [types, gender, loadPets]);
+  const onTypeChange = useCallback(
+    (typeName) => {
+      const nextType = typeName || '';
+      const t = types.find(
+        (x) => String(x.name).toLowerCase() === String(nextType).toLowerCase()
+      );
+      const allowed = t?.genders || ['Male', 'Female', 'Unknown'];
+      const nextGender = allowed.includes(gender) ? gender : '';
+      return loadPets({ type: nextType, gender: nextGender, page: 1 });
+    },
+    [types, gender, loadPets]
+  );
 
-  const onGenderChange = useCallback((g) => loadPets({ gender: g || '', page: 1 }), [loadPets]);
-  const onSizeChange   = useCallback((s) => loadPets({ size: s || '', page: 1 }),   [loadPets]);
-  const onAgeChange    = useCallback((a) => loadPets({ age: a || '', page: 1 }),    [loadPets]);
-  const onCityChange   = useCallback((v) => loadPets({ city: v.trim(), page: 1 }),  [loadPets]);
-  const onStateChange  = useCallback((v) => loadPets({ state: v.trim(), page: 1 }), [loadPets]);
+  const onGenderChange = useCallback(
+    (g) => loadPets({ gender: g || '', page: 1 }),
+    [loadPets]
+  );
+  const onSizeChange = useCallback(
+    (s) => loadPets({ size: s || '', page: 1 }),
+    [loadPets]
+  );
+  const onAgeChange = useCallback(
+    (a) => loadPets({ age: a || '', page: 1 }),
+    [loadPets]
+  );
+  const onCityChange = useCallback(
+    (v) => loadPets({ city: v.trim(), page: 1 }),
+    [loadPets]
+  );
+  const onStateChange = useCallback(
+    (v) => loadPets({ state: v.trim(), page: 1 }),
+    [loadPets]
+  );
 
   // debounced search
   const searchTimerRef = useRef(null);
-  const onQueryChange = useCallback((value) => {
-    const v = value.trimStart();
-    setQ(v);
-    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-    searchTimerRef.current = setTimeout(() => {
-      loadPets({ q: v, page: 1 });
-    }, 300);
-  }, [loadPets]);
+  const onQueryChange = useCallback(
+    (value) => {
+      const v = value.trimStart();
+      setQ(v);
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+      searchTimerRef.current = setTimeout(() => {
+        loadPets({ q: v, page: 1 });
+      }, 300);
+    },
+    [loadPets]
+  );
 
   const clearFilters = useCallback(() => {
-    return loadPets({ type: '', gender: '', size: '', age: '', city: '', state: '', q: '', page: 1 });
+    return loadPets({
+      type: '',
+      gender: '',
+      size: '',
+      age: '',
+      city: '',
+      state: '',
+      q: '',
+      page: 1,
+    });
   }, [loadPets]);
 
   const canPrev = pagination.current_page > 1;
@@ -151,14 +200,38 @@ export default function usePetSearch(initial = {}) {
 
   return {
     // data
-    types, animals, savedPets, pagination, genderOptions, sizeOptions, ageOptions,
+    types,
+    animals,
+    savedPets,
+    pagination,
+    genderOptions,
+    sizeOptions,
+    ageOptions,
     // selections
-    selectedType, gender, size, age, city, state, q,
+    selectedType,
+    gender,
+    size,
+    age,
+    city,
+    state,
+    q,
     // ui
-    loading, error, canPrev, canNext,
+    loading,
+    error,
+    canPrev,
+    canNext,
     // actions
-    loadPets, loadSavedPets, toggleLike, isPetSaved,
-    onTypeChange, onGenderChange, onSizeChange, onAgeChange,
-    onCityChange, onStateChange, onQueryChange, clearFilters,
+    loadPets,
+    loadSavedPets,
+    toggleLike,
+    isPetSaved,
+    onTypeChange,
+    onGenderChange,
+    onSizeChange,
+    onAgeChange,
+    onCityChange,
+    onStateChange,
+    onQueryChange,
+    clearFilters,
   };
 }

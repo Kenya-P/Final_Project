@@ -1,16 +1,9 @@
-/* Overall page width remains the same */
-.main { 
-  padding: 24px 16px; 
-  max-width: 1200px; 
-  margin: 0 auto; 
+.main {
+  padding: 24px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
-}
-.main__title { 
-  margin: 0 0 18px; 
-  text-align: center; 
-  font-size: 2rem; 
-  line-height: 1.2; 
 }
 
 .main__filtersbar {
@@ -29,19 +22,24 @@
   font-weight: 600;
 }
 
-.main__content { 
-  margin-top: 16px; 
-  min-height: 60vh;
+.main__filtersbar-btn:hover {
+  background: #fafafa;
+  border-color: #333;
+}
+
+.main__content {
+  margin-top: 16px;
   overflow: visible;
 }
 
 .main__pet-grid {
-  display: grid; 
-  grid-template-columns: repeat(3, minmax(0, 1fr)); 
-  gap: 20px; 
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
   list-style: none;
   padding: 0;
   margin: 16px auto 0;
+  align-items: start;
 }
 
 .main__pagination {
@@ -81,7 +79,7 @@
   color: #333;
 }
 
-.show-more { 
+.show-more {
   display: block;
   margin: 16px auto 0;
   padding: 10px 16px;
@@ -91,39 +89,31 @@
   cursor: pointer;
 }
 
-.show-more:hover { 
+.show-more:hover {
   background: #fafafa;
-}
-
-/* Two-column layout on desktop: sidebar + content */
-.main__layout {
-  display: grid;
-  gap: 20px;
-  align-items: start;
 }
 
 .filters__popover {
   position: fixed;
-  top: 220px;
+  top: 50px;
   left: 220px;
   width: 340px;
-  max-height: min(80vh,640px);
   overflow: auto;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 20px 45px rgba(0,0,0,.18);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
   z-index: 31;
   padding: 12px;
 }
 
-.filters__popover-overlay { 
-  position: fixed; 
-  inset: 0; 
-  background: rgba(0,0,0,.28); 
+.filters__popover-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
   z-index: 30;
 }
 
-.filters__popover-header { 
+.filters__popover-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -131,7 +121,7 @@
 }
 
 .filters__popover-close {
-  background: none; 
+  background: none;
   border: 0;
   font-size: 22px;
   line-height: 1;
@@ -161,84 +151,15 @@
 }
 
 @media (max-width: 640px) {
-  .filters-popover { left:0; right:0; top:auto; bottom:0; width:100%; max-height:85vh;
-    border-bottom-left-radius:0; border-bottom-right-radius:0; }
+  .filters__popover {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 420px;
+  }
 }
 
-/* Mobile dropdown trigger lives in content area; hide it on desktop */
-.main__filters-mobile { margin-bottom: 10px; }
 @media (min-width: 1024px) {
-  .main__filters-mobile { display: none; }
+  .main__pet-grid {
+    grid-template-columns: 280px 1fr;
+  }
 }
-
-/* Details-based dropdown styles */
-.filters-drop {
-  display: inline-block;
-  border: 1px solid #e6e6e6;
-  border-radius: 12px;
-  background: #fff;
-  overflow: hidden;
-}
-.filters-drop__summary {
-  list-style: none; 
-  cursor: pointer;
-  padding: 10px 14px; 
-  font-weight: 600;
-}
-.filters-drop__summary::marker,
-.filters-drop summary::-webkit-details-marker { 
-  display: none; 
-}
-.filters-drop__content { 
-  padding: 10px 14px 14px; 
-  border-top: 1px solid #eee; 
-}
-
-/* Keep your existing grid for cards */
-.main__grid { 
-  display: grid; 
-  grid-template-columns: repeat(3, minmax(0, 1fr)); 
-  gap: 16px; 
-}
-.main__grid--saved { 
-  grid-template-columns: repeat(3, minmax(0, 1fr)); 
-}
-
-@media (max-width: 900px) {
-  .main__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .main__grid--saved { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 520px) {
-  .main__grid, .main__grid--saved { grid-template-columns: 1fr; }
-}
-
-/* Pager, messages, buttons retained from earlier */
-.main__pager { 
-  display: flex; 
-  justify-content: center; 
-  gap: 10px; 
-  margin: 8px 0 16px; 
-}
-.main__btn { 
-  height: 30px;
-  padding: 0 14px; 
-  border-radius: 10px; 
-  border: 1px solid #d6d6d6; 
-  background: #f7f7f7; 
-  cursor: pointer; 
-}
-.main__btn:hover { background: #efefef; }
-.main__btn--ghost { background: transparent; }
-.main__page { font-size: .95rem; color: #333; }
-.main__message { margin: 16px 0; color: #333; }
-.main__message--error { color: #b00020; }
-
-.main__saved { margin-top: 24px; }
-.main__saved-head { 
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between; 
-  gap: 12px; 
-}
-.main__subtitle { margin: 0; font-size: 1.25rem; }
-.main__saved-actions { display: inline-flex; gap: 8px; }

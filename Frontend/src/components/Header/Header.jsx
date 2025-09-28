@@ -1,8 +1,7 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { NavLink } from "react-router-dom";
-import logo from "../../assets/images/logo.svg";
-import "./Header.css";
+import PropTypes from 'prop-types';
+import { NavLink } from 'react-router-dom';
+import logo from '../../assets/images/logo.svg';
+import './Header.css';
 
 const noop = () => {};
 
@@ -15,19 +14,31 @@ export default function Header({
   return (
     <header className="header">
       <img src={logo} alt="Paw Print Logo" className="header__logo" />
-      <h1 to="/" className="header__brand">Perfect Pet Finder</h1>
+      <h1 to="/" className="header__brand">
+        Perfect Pet Finder
+      </h1>
       <nav className="header__nav">
-        <NavLink to="/" className="header__link">Home</NavLink>
-        <NavLink to="/profile" className="header__link">Saved Pets</NavLink>
+        <NavLink to="/" className="header__link">
+          Home
+        </NavLink>
+        <NavLink to="/profile" className="header__link">
+          Saved Pets
+        </NavLink>
         {!currentUser ? (
           <>
-            <button type="button" className="header__btn" onClick={onLogin}>Log In</button>
-            <button type="button" className="header__btn" onClick={onRegister}>Register</button>
+            <button type="button" className="header__btn" onClick={onLogin}>
+              Log In
+            </button>
+            <button type="button" className="header__btn" onClick={onRegister}>
+              Register
+            </button>
           </>
         ) : (
           <>
             <span className="header__user">{currentUser.name}</span>
-            <button type="button" className="header__btn" onClick={onLogout}>Log Out</button>
+            <button type="button" className="header__btn" onClick={onLogout}>
+              Log Out
+            </button>
           </>
         )}
       </nav>
