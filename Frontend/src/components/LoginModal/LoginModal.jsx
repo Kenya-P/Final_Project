@@ -13,7 +13,7 @@ export default function LoginModal({
   onClickRegister,
   errorText,
 }) {
-  const { values, handleChange, setValues, errors, isValid, resetForm } =
+  const { values, handleChange, errors, isValid, resetForm } =
     useFormAndValidation(LOGIN_INITIAL);
 
   // Reset only when opened to avoid render loops

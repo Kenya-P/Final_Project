@@ -13,7 +13,7 @@ export default function RegisterModal({
   onClickLogin,
   errorText,
 }) {
-  const { values, handleChange, setValues, errors, isValid, resetForm } =
+  const { values, handleChange, errors, isValid, resetForm } =
     useFormAndValidation(REGISTER_INITIAL);
 
   // Reset only when opened to avoid render loops
