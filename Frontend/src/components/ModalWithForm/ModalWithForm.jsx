@@ -50,12 +50,12 @@ export default function ModalWithForm({
 
             {secondaryButtonText &&
               (secondaryButtonLink ? (
-                <a className="modal__secondary" href={secondaryButtonLink}>
+                <a className="modal__secondary-btn" href={secondaryButtonLink}>
                   {secondaryButtonText}
                 </a>
               ) : (
                 <button
-                  className="modal__secondary"
+                  className="modal__secondary-btn"
                   onClick={handleSecondary}
                   type="button"
                 >

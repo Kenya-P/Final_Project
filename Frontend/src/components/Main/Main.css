@@ -29,7 +29,6 @@
 
 .main__content {
   margin-top: 16px;
-  overflow: visible;
 }
 
 .main__pet-grid {
@@ -96,14 +95,13 @@
 .filters__popover {
   position: fixed;
   top: 50px;
-  left: 220px;
-  width: 340px;
   overflow: auto;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
   z-index: 31;
   padding: 12px;
+  margin: 20px;
 }
 
 .filters__popover-overlay {
@@ -150,7 +148,11 @@
   border-radius: 8px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 320px) {
+  .main__pet-grid {
+    grid-template-columns: 1fr;
+  }
+
   .filters__popover {
     left: 50%;
     transform: translateX(-50%);

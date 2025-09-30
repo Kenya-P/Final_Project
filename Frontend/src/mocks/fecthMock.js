@@ -52,7 +52,7 @@ export function setupMockApi() {
         return realFetch(input, init);
       }
 
-      console.info('[mock] intercept', method, url.pathname, url.search);
+      //console.info('[mock] intercept', method, url.pathname, url.search);
 
       await new Promise((r) => setTimeout(r, 60));
 

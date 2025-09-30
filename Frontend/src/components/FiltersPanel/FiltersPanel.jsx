@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useId } from 'react';
+import React, { useId, useEffect, useState } from 'react';
 import './FiltersPanel.css';
 import {
   GENDER_OPTIONS,
@@ -37,6 +37,9 @@ export default function FiltersPanel({
   const uid = useId();
   const makeId = (name) => `${uid}-${name}`;
 
+  // local state for the search input
+  const [qLocal, setQLocal] = React.useState(q);
+
   // unique ids per control
   const qId = makeId('q');
   const typeId = makeId('type');
@@ -52,8 +55,23 @@ export default function FiltersPanel({
       .map((v) => (typeof v === 'string' ? v.trim() : v))
       .every((v) => !v);
 
+  // when the "q" prop changes, update the local state
+  useEffect(() => {
+    setQLocal(q);
+  }, [q]);
+
+  // when the local state changes, notify the parent after a delay
+  useEffect(() => {
+    const timeout = setTimeout(() => onQueryChange(qLocal), 500);
+    return () => clearTimeout(timeout);
+  }, [qLocal, onQueryChange]);
+
   return (
-    <form className="filters" onSubmit={(e) => e.preventDefault()}>
+    <form
+      className="filters"
+      onSubmit={(e) => e.preventDefault()}
+      aria-busy={loading}
+    >
       <div className="filters__group">
         <label className="filters__label" htmlFor={qId}>
           Search
@@ -62,10 +80,12 @@ export default function FiltersPanel({
           id={qId}
           className="filters__input"
           type="search"
-          value={q}
-          onChange={(e) => onQueryChange(e.target.value)}
+          value={qLocal}
+          onChange={(e) => setQLocal(e.target.value)}
           placeholder="Name, breed, type..."
           disabled={loading}
+          autoComplete="off"
+          autoFocus
         />
       </div>
 
@@ -78,7 +98,7 @@ export default function FiltersPanel({
           className="filters__input"
           value={selectedType}
           onChange={(e) => onTypeChange(e.target.value)}
-          disabled={loading}
+          //disabled={loading}
         >
           <option value="">All</option>
           {typeNames.map((t) => (
@@ -98,7 +118,7 @@ export default function FiltersPanel({
           className="filters__input"
           value={gender}
           onChange={(e) => onGenderChange(e.target.value)}
-          disabled={loading}
+          //disabled={loading}
         >
           <option value="">Any</option>
           {genderOptions.map((g) => (
@@ -118,7 +138,7 @@ export default function FiltersPanel({
           className="filters__input"
           value={size}
           onChange={(e) => onSizeChange(e.target.value)}
-          disabled={loading}
+          //disabled={loading}
         >
           <option value="">Any</option>
           {sizeOptions.map((s) => (
@@ -138,7 +158,7 @@ export default function FiltersPanel({
           className="filters__input"
           value={age}
           onChange={(e) => onAgeChange(e.target.value)}
-          disabled={loading}
+          //disabled={loading}
         >
           <option value="">Any</option>
           {ageOptions.map((a) => (
@@ -160,7 +180,7 @@ export default function FiltersPanel({
           value={city}
           onChange={(e) => onCityChange(e.target.value)}
           placeholder="e.g., Jersey City"
-          disabled={loading}
+          //disabled={loading}
         />
       </div>
 
@@ -175,7 +195,7 @@ export default function FiltersPanel({
           value={state}
           onChange={(e) => onStateChange(e.target.value)}
           placeholder="e.g., NJ"
-          disabled={loading}
+          //disabled={loading}
         />
       </div>
 

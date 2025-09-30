@@ -96,11 +96,10 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 320px) {
   .header {
-    grid-template-columns: 1fr auto; /* brand | actions */
-    grid-template-rows: auto auto; /* nav on new line */
     row-gap: 8px;
+    flex-direction: column;
   }
   .header__nav {
     grid-column: 1 / -1;
