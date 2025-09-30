@@ -38,7 +38,7 @@ h3 {
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #696363bf;
   text-decoration: inherit;
 }
 
@@ -62,11 +62,7 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  border-color: #696363bf;
 }
 
 @media (prefers-color-scheme: light) {
