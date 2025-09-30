@@ -43,7 +43,7 @@
 }
 
 /* Sticky on desktop so it stays visible while scrolling cards */
-@media (min-width: 1024px) {
+@media (min-width: 320px) and (max-width: 1020px) {
   .filters {
     position: sticky;
     top: 72px; /* header height + spacing */

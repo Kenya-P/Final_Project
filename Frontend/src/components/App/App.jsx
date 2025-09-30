@@ -285,97 +285,99 @@ export default function App() {
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <Header
-        currentUser={currentUser}
-        onLogin={openLogin}
-        onRegister={openRegister}
-        onLogout={handleLogout}
-      />
-
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Main
-              /* data/options */
-              types={types}
-              animals={animals}
-              pagination={pagination}
-              genderOptions={['Male', 'Female']}
-              sizeOptions={['Small', 'Medium', 'Large']}
-              ageOptions={['Baby', 'Young', 'Adult', 'Senior']}
-              /* selected values */
-              selectedType={selectedType}
-              gender={gender}
-              size={size}
-              age={age}
-              q={q}
-              city={city}
-              state={usState}
-              /* handlers */
-              onTypeChange={setSelectedType}
-              onGenderChange={setGender}
-              onSizeChange={setSize}
-              onAgeChange={setAge}
-              onQueryChange={setQ}
-              onCityChange={setCity}
-              onStateChange={setUsState}
-              clearFilters={() => {
-                setSelectedType('');
-                setGender('');
-                setSize('');
-                setAge('');
-                setQ('');
-                setCity('');
-                setUsState('');
-              }}
-              /* like/auth */
-              isPetSaved={isPetSaved}
-              toggleLike={toggleLike}
-              onAuthRequired={onAuthRequired}
-              isAuthenticated={!!currentUser}
-              /* status + paging */
-              isLoadingPets={isLoadingPets}
-              petsError={petsError}
-              canPrev={canPrev}
-              canNext={canNext}
-              loadPets={loadPets}
-            />
-          }
+      <div className="page">
+        <Header
+          currentUser={currentUser}
+          onLogin={openLogin}
+          onRegister={openRegister}
+          onLogout={handleLogout}
         />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute isLoggedIn={!!currentUser}>
-              <Profile
-                savedPets={savedPets}
-                loadSavedPets={loadSavedPets}
+
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Main
+                /* data/options */
+                types={types}
+                animals={animals}
+                pagination={pagination}
+                genderOptions={['Male', 'Female']}
+                sizeOptions={['Small', 'Medium', 'Large']}
+                ageOptions={['Baby', 'Young', 'Adult', 'Senior']}
+                /* selected values */
+                selectedType={selectedType}
+                gender={gender}
+                size={size}
+                age={age}
+                q={q}
+                city={city}
+                state={usState}
+                /* handlers */
+                onTypeChange={setSelectedType}
+                onGenderChange={setGender}
+                onSizeChange={setSize}
+                onAgeChange={setAge}
+                onQueryChange={setQ}
+                onCityChange={setCity}
+                onStateChange={setUsState}
+                clearFilters={() => {
+                  setSelectedType('');
+                  setGender('');
+                  setSize('');
+                  setAge('');
+                  setQ('');
+                  setCity('');
+                  setUsState('');
+                }}
+                /* like/auth */
+                isPetSaved={isPetSaved}
                 toggleLike={toggleLike}
+                onAuthRequired={onAuthRequired}
+                isAuthenticated={!!currentUser}
+                /* status + paging */
+                isLoadingPets={isLoadingPets}
+                petsError={petsError}
+                canPrev={canPrev}
+                canNext={canNext}
+                loadPets={loadPets}
               />
-            </ProtectedRoute>
-          }
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute isLoggedIn={!!currentUser}>
+                <Profile
+                  savedPets={savedPets}
+                  loadSavedPets={loadSavedPets}
+                  toggleLike={toggleLike}
+                />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+        <Footer />
+
+        {/* Modals */}
+        <LoginModal
+          isOpen={isLoginOpen}
+          onClose={closeModals}
+          onLogin={handleLogin}
+          isLoading={isBusy}
+          onClickRegister={openRegister}
+          errorText={loginError}
         />
-      </Routes>
-      <Footer />
 
-      {/* Modals */}
-      <LoginModal
-        isOpen={isLoginOpen}
-        onClose={closeModals}
-        onLogin={handleLogin}
-        isLoading={isBusy}
-        onClickRegister={openRegister}
-        errorText={loginError}
-      />
-
-      <RegisterModal
-        isOpen={isRegisterOpen}
-        onClose={closeModals}
-        onRegister={handleRegister}
-        isLoading={isBusy}
-        onClickLogin={openLogin}
-        errorText={registerError}
-      />
+        <RegisterModal
+          isOpen={isRegisterOpen}
+          onClose={closeModals}
+          onRegister={handleRegister}
+          isLoading={isBusy}
+          onClickLogin={openLogin}
+          errorText={registerError}
+        />
+      </div>
 
       <ModalWithForm isOpen={false} onClose={() => {}} title="" />
     </CurrentUserContext.Provider>

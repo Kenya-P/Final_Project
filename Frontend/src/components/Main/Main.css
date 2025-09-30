@@ -148,20 +148,15 @@
   border-radius: 8px;
 }
 
-@media (max-width: 320px) {
+@media (min-width: 320px) and (max-width: 1020px) {
   .main__pet-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .filters__popover {
     left: 50%;
     transform: translateX(-50%);
     max-width: 420px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .main__pet-grid {
-    grid-template-columns: 280px 1fr;
   }
 }

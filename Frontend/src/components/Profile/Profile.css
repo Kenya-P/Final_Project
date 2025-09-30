@@ -19,15 +19,10 @@
   gap: 16px;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 320px) and (max-width: 1020px) {
   .profile__grid {
     grid-template-columns: repeat(2, 1fr);
     margin: 0;
     padding: 0;
-  }
-}
-@media (max-width: 480px) {
-  .profile__grid {
-    grid-template-columns: 1fr;
   }
 }

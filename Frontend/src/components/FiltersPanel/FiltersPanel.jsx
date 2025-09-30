@@ -1,7 +1,11 @@
 import PropTypes from 'prop-types';
 import { useId, useEffect, useState } from 'react';
 import './FiltersPanel.css';
-import { GENDER_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from '../../config/constants.js';
+import {
+  GENDER_OPTIONS,
+  SIZE_OPTIONS,
+  AGE_OPTIONS,
+} from '../../config/constants.js';
 
 export default function FiltersPanel({
   // data
@@ -35,7 +39,13 @@ export default function FiltersPanel({
 
   // Local draft so typing never triggers parent fetch
   const [draft, setDraft] = useState(() => ({
-    q, selectedType, gender, size, age, city, state,
+    q,
+    selectedType,
+    gender,
+    size,
+    age,
+    city,
+    state,
   }));
 
   // Sync draft whenever parent props change (e.g., after Clear from outside)
@@ -56,7 +66,15 @@ export default function FiltersPanel({
 
   const handleClear = () => {
     clearFilters?.();
-    setDraft({ q: '', selectedType: '', gender: '', size: '', age: '', city: '', state: '' });
+    setDraft({
+      q: '',
+      selectedType: '',
+      gender: '',
+      size: '',
+      age: '',
+      city: '',
+      state: '',
+    });
   };
 
   const ids = {
@@ -76,11 +94,16 @@ export default function FiltersPanel({
   return (
     <form
       className="filters"
-      onSubmit={(e) => { e.preventDefault(); applyAndClose(); }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        applyAndClose();
+      }}
       aria-busy={loading}
     >
       <div className="filters__group">
-        <label className="filters__label" htmlFor={ids.q}>Search</label>
+        <label className="filters__label" htmlFor={ids.q}>
+          Search
+        </label>
         <input
           id={ids.q}
           className="filters__input"
@@ -94,20 +117,30 @@ export default function FiltersPanel({
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={ids.type}>Type</label>
+        <label className="filters__label" htmlFor={ids.type}>
+          Type
+        </label>
         <select
           id={ids.type}
           className="filters__input"
           value={draft.selectedType}
-          onChange={(e) => setDraft((d) => ({ ...d, selectedType: e.target.value }))}
+          onChange={(e) =>
+            setDraft((d) => ({ ...d, selectedType: e.target.value }))
+          }
         >
           <option value="">All</option>
-          {typeNames.map((t) => <option key={t} value={t}>{t}</option>)}
+          {typeNames.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={ids.gender}>Gender</label>
+        <label className="filters__label" htmlFor={ids.gender}>
+          Gender
+        </label>
         <select
           id={ids.gender}
           className="filters__input"
@@ -115,12 +148,18 @@ export default function FiltersPanel({
           onChange={(e) => setDraft((d) => ({ ...d, gender: e.target.value }))}
         >
           <option value="">Any</option>
-          {genderOptions.map((g) => <option key={g} value={g}>{g}</option>)}
+          {genderOptions.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={ids.size}>Size</label>
+        <label className="filters__label" htmlFor={ids.size}>
+          Size
+        </label>
         <select
           id={ids.size}
           className="filters__input"
@@ -128,12 +167,18 @@ export default function FiltersPanel({
           onChange={(e) => setDraft((d) => ({ ...d, size: e.target.value }))}
         >
           <option value="">Any</option>
-          {sizeOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+          {sizeOptions.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={ids.age}>Age</label>
+        <label className="filters__label" htmlFor={ids.age}>
+          Age
+        </label>
         <select
           id={ids.age}
           className="filters__input"
@@ -141,12 +186,18 @@ export default function FiltersPanel({
           onChange={(e) => setDraft((d) => ({ ...d, age: e.target.value }))}
         >
           <option value="">Any</option>
-          {ageOptions.map((a) => <option key={a} value={a}>{a}</option>)}
+          {ageOptions.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={ids.city}>City</label>
+        <label className="filters__label" htmlFor={ids.city}>
+          City
+        </label>
         <input
           id={ids.city}
           className="filters__input"
@@ -158,7 +209,9 @@ export default function FiltersPanel({
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={ids.state}>State</label>
+        <label className="filters__label" htmlFor={ids.state}>
+          State
+        </label>
         <input
           id={ids.state}
           className="filters__input"
@@ -178,7 +231,9 @@ export default function FiltersPanel({
         >
           Clear filters
         </button>
-        <button type="submit" className="filters__btn">Done</button>
+        <button type="submit" className="filters__btn">
+          Done
+        </button>
       </div>
     </form>
   );
