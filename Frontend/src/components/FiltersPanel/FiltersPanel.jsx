@@ -1,11 +1,7 @@
 import PropTypes from 'prop-types';
-import React, { useId, useEffect, useState } from 'react';
+import { useId, useEffect, useState } from 'react';
 import './FiltersPanel.css';
-import {
-  GENDER_OPTIONS,
-  SIZE_OPTIONS,
-  AGE_OPTIONS,
-} from '../../config/constants.js';
+import { GENDER_OPTIONS, SIZE_OPTIONS, AGE_OPTIONS } from '../../config/constants.js';
 
 export default function FiltersPanel({
   // data
@@ -13,7 +9,7 @@ export default function FiltersPanel({
   genderOptions = GENDER_OPTIONS,
   sizeOptions = SIZE_OPTIONS,
   ageOptions = AGE_OPTIONS,
-  // selections
+  // selections from parent
   selectedType = '',
   gender = '',
   size = '',
@@ -23,7 +19,7 @@ export default function FiltersPanel({
   q = '',
   // ui
   loading = false,
-  // actions
+  // actions (parent updaters)
   onTypeChange = () => {},
   onGenderChange = () => {},
   onSizeChange = () => {},
@@ -37,165 +33,139 @@ export default function FiltersPanel({
   const uid = useId();
   const makeId = (name) => `${uid}-${name}`;
 
-  // local state for the search input
-  const [qLocal, setQLocal] = React.useState(q);
+  // Local draft so typing never triggers parent fetch
+  const [draft, setDraft] = useState(() => ({
+    q, selectedType, gender, size, age, city, state,
+  }));
 
-  // unique ids per control
-  const qId = makeId('q');
-  const typeId = makeId('type');
-  const genderId = makeId('gender');
-  const sizeId = makeId('size');
-  const ageId = makeId('age');
-  const cityId = makeId('city');
-  const stateId = makeId('state');
-
-  const disableClear =
-    loading ||
-    [selectedType, gender, size, age, city, state, q]
-      .map((v) => (typeof v === 'string' ? v.trim() : v))
-      .every((v) => !v);
-
-  // when the "q" prop changes, update the local state
+  // Sync draft whenever parent props change (e.g., after Clear from outside)
   useEffect(() => {
-    setQLocal(q);
-  }, [q]);
+    setDraft({ q, selectedType, gender, size, age, city, state });
+  }, [q, selectedType, gender, size, age, city, state]);
 
-  // when the local state changes, notify the parent after a delay
-  useEffect(() => {
-    const timeout = setTimeout(() => onQueryChange(qLocal), 500);
-    return () => clearTimeout(timeout);
-  }, [qLocal, onQueryChange]);
+  const applyAndClose = () => {
+    onQueryChange(draft.q);
+    onTypeChange(draft.selectedType);
+    onGenderChange(draft.gender);
+    onSizeChange(draft.size);
+    onAgeChange(draft.age);
+    onCityChange(draft.city);
+    onStateChange(draft.state);
+    onClose?.();
+  };
+
+  const handleClear = () => {
+    clearFilters?.();
+    setDraft({ q: '', selectedType: '', gender: '', size: '', age: '', city: '', state: '' });
+  };
+
+  const ids = {
+    q: makeId('q'),
+    type: makeId('type'),
+    gender: makeId('gender'),
+    size: makeId('size'),
+    age: makeId('age'),
+    city: makeId('city'),
+    state: makeId('state'),
+  };
+
+  const disableClear = Object.values(draft).every((v) =>
+    typeof v === 'string' ? v.trim() === '' : !v
+  );
 
   return (
     <form
       className="filters"
-      onSubmit={(e) => e.preventDefault()}
+      onSubmit={(e) => { e.preventDefault(); applyAndClose(); }}
       aria-busy={loading}
     >
       <div className="filters__group">
-        <label className="filters__label" htmlFor={qId}>
-          Search
-        </label>
+        <label className="filters__label" htmlFor={ids.q}>Search</label>
         <input
-          id={qId}
+          id={ids.q}
           className="filters__input"
           type="search"
-          value={qLocal}
-          onChange={(e) => setQLocal(e.target.value)}
+          value={draft.q}
+          onChange={(e) => setDraft((d) => ({ ...d, q: e.target.value }))}
           placeholder="Name, breed, type..."
-          disabled={loading}
-          autoComplete="off"
           autoFocus
+          /* keep enabled during loading to preserve focus */
         />
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={typeId}>
-          Type
-        </label>
+        <label className="filters__label" htmlFor={ids.type}>Type</label>
         <select
-          id={typeId}
+          id={ids.type}
           className="filters__input"
-          value={selectedType}
-          onChange={(e) => onTypeChange(e.target.value)}
-          //disabled={loading}
+          value={draft.selectedType}
+          onChange={(e) => setDraft((d) => ({ ...d, selectedType: e.target.value }))}
         >
           <option value="">All</option>
-          {typeNames.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
+          {typeNames.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={genderId}>
-          Gender
-        </label>
+        <label className="filters__label" htmlFor={ids.gender}>Gender</label>
         <select
-          id={genderId}
+          id={ids.gender}
           className="filters__input"
-          value={gender}
-          onChange={(e) => onGenderChange(e.target.value)}
-          //disabled={loading}
+          value={draft.gender}
+          onChange={(e) => setDraft((d) => ({ ...d, gender: e.target.value }))}
         >
           <option value="">Any</option>
-          {genderOptions.map((g) => (
-            <option key={g} value={g}>
-              {g}
-            </option>
-          ))}
+          {genderOptions.map((g) => <option key={g} value={g}>{g}</option>)}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={sizeId}>
-          Size
-        </label>
+        <label className="filters__label" htmlFor={ids.size}>Size</label>
         <select
-          id={sizeId}
+          id={ids.size}
           className="filters__input"
-          value={size}
-          onChange={(e) => onSizeChange(e.target.value)}
-          //disabled={loading}
+          value={draft.size}
+          onChange={(e) => setDraft((d) => ({ ...d, size: e.target.value }))}
         >
           <option value="">Any</option>
-          {sizeOptions.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
+          {sizeOptions.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={ageId}>
-          Age
-        </label>
+        <label className="filters__label" htmlFor={ids.age}>Age</label>
         <select
-          id={ageId}
+          id={ids.age}
           className="filters__input"
-          value={age}
-          onChange={(e) => onAgeChange(e.target.value)}
-          //disabled={loading}
+          value={draft.age}
+          onChange={(e) => setDraft((d) => ({ ...d, age: e.target.value }))}
         >
           <option value="">Any</option>
-          {ageOptions.map((a) => (
-            <option key={a} value={a}>
-              {a}
-            </option>
-          ))}
+          {ageOptions.map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={cityId}>
-          City
-        </label>
+        <label className="filters__label" htmlFor={ids.city}>City</label>
         <input
-          id={cityId}
+          id={ids.city}
           className="filters__input"
           type="text"
-          value={city}
-          onChange={(e) => onCityChange(e.target.value)}
+          value={draft.city}
+          onChange={(e) => setDraft((d) => ({ ...d, city: e.target.value }))}
           placeholder="e.g., Jersey City"
-          //disabled={loading}
         />
       </div>
 
       <div className="filters__group">
-        <label className="filters__label" htmlFor={stateId}>
-          State
-        </label>
+        <label className="filters__label" htmlFor={ids.state}>State</label>
         <input
-          id={stateId}
+          id={ids.state}
           className="filters__input"
           type="text"
-          value={state}
-          onChange={(e) => onStateChange(e.target.value)}
+          value={draft.state}
+          onChange={(e) => setDraft((d) => ({ ...d, state: e.target.value }))}
           placeholder="e.g., NJ"
-          //disabled={loading}
         />
       </div>
 
@@ -203,17 +173,12 @@ export default function FiltersPanel({
         <button
           type="button"
           className="filters__btn filters__btn--ghost"
-          onClick={clearFilters}
+          onClick={handleClear}
           disabled={disableClear}
         >
           Clear filters
         </button>
-
-        {onClose && (
-          <button type="button" className="filters__btn" onClick={onClose}>
-            Done
-          </button>
-        )}
+        <button type="submit" className="filters__btn">Done</button>
       </div>
     </form>
   );
@@ -224,7 +189,6 @@ FiltersPanel.propTypes = {
   genderOptions: PropTypes.arrayOf(PropTypes.string),
   sizeOptions: PropTypes.arrayOf(PropTypes.string),
   ageOptions: PropTypes.arrayOf(PropTypes.string),
-
   selectedType: PropTypes.string,
   gender: PropTypes.string,
   size: PropTypes.string,
@@ -232,9 +196,7 @@ FiltersPanel.propTypes = {
   city: PropTypes.string,
   state: PropTypes.string,
   q: PropTypes.string,
-
   loading: PropTypes.bool,
-
   onTypeChange: PropTypes.func,
   onGenderChange: PropTypes.func,
   onSizeChange: PropTypes.func,
