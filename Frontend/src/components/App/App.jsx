@@ -11,7 +11,6 @@ import RegisterModal from '../RegisterModal/RegisterModal.jsx';
 import ModalWithForm from '../ModalWithForm/ModalWithForm.jsx';
 
 import { logIn, registerUser, logOut } from '../../../utils/auth.js';
-import { getPets, getAnimalTypes } from '../../../utils/PetFinderApi.js';
 import { PAGE_LIMIT } from '../../config/constants.js';
 import { loadSaved, saveSaved } from '../../../utils/savedPets.js';
 
@@ -38,7 +37,6 @@ export default function App() {
 
   const [types, setTypes] = useState([]);
   const [animals, setAnimals] = useState([]);
-  const [pagination, setPagination] = useState(null);
 
   const [savedPets, setSavedPets] = useState([]);
   const [isLoadingPets, setIsLoadingPets] = useState(false);
@@ -81,13 +79,8 @@ export default function App() {
         });
 
         const animalsArray = data?.animals ?? [];
-        const p = data?.pagination ?? {};
 
         setAnimals(animalsArray);
-        setPagination({
-          page: p.current_page ?? p.page ?? pageToLoad ?? 1,
-          totalPages: p.total_pages ?? p.totalPages ?? 1,
-        });
         setPage(p.current_page ?? p.page ?? pageToLoad ?? 1);
       } catch (e) {
         setPetsError(
@@ -147,25 +140,6 @@ export default function App() {
     setIsRegisterOpen(false);
     setIsLoginOpen(true);
   }, []);
-
-  // pagination helpers
-  const canPrev = (pagination?.page ?? page) > 1;
-  const canNext = (pagination?.page ?? page) < (pagination?.totalPages ?? 1);
-
-  const loadPets = useCallback(
-    ({ direction } = {}) => {
-      const curr = pagination?.page ?? page;
-      const next =
-        direction === 'next'
-          ? curr + 1
-          : direction === 'prev'
-            ? Math.max(1, curr - 1)
-            : curr;
-      setPage(next);
-      fetchAnimals(next);
-    },
-    [pagination?.page, page, fetchAnimals]
-  );
 
   // helper: merge guest saved pets into a user’s list (dedup by id)
   const mergeGuestInto = useCallback((userId) => {
@@ -231,57 +205,6 @@ export default function App() {
     closeModals();
   };
 
-  /*useEffect(() => {
-    (async () => {
-      try {
-        const t = await getAnimalTypes();
-        // normalize to string names regardless of API shape
-        const names = Array.from(new Set((t?.types || []).map((x) => (typeof x === "string" ? x : x?.name)).filter(Boolean)));
-        setTypes(names);
-      } catch (e) {
-        console.error("[App] getAnimalTypes failed:", e);
-      }
-      try {
-        const page1 = await getPets({ page: 1 });
-        setAnimals(page1?.animals || []);
-      } catch (e) {
-        console.error("[App] getPets failed:", e);
-      }
-    })();
-  }, []);*/
-
-  useEffect(() => {
-    let ignore = false;
-    (async () => {
-      try {
-        const t = await getAnimalTypes();
-        // Normalize to [{ name: "Cat" }, ...] no matter what backend/mock returns
-        const normalized = Array.from(
-          new Set(
-            (t?.types ?? [])
-              .map((x) => (typeof x === 'string' ? x : x?.name))
-              .filter(Boolean)
-          )
-        ).map((name) => ({ name }));
-        if (!ignore) setTypes(normalized);
-      } catch (e) {
-        console.warn('[App] getAnimalTypes failed:', e);
-      }
-    })();
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    setPage(1);
-    fetchAnimals(1);
-  }, [selectedType, gender, size, age, q, city, usState, fetchAnimals]);
-
-  // when user changes, reload their saved pets once
-  useEffect(() => {
-    if (currentUser?._id) loadSavedPets(currentUser._id);
-  }, [currentUser?._id, loadSavedPets]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -301,7 +224,6 @@ export default function App() {
                 /* data/options */
                 types={types}
                 animals={animals}
-                pagination={pagination}
                 genderOptions={['Male', 'Female']}
                 sizeOptions={['Small', 'Medium', 'Large']}
                 ageOptions={['Baby', 'Young', 'Adult', 'Senior']}
@@ -338,9 +260,6 @@ export default function App() {
                 /* status + paging */
                 isLoadingPets={isLoadingPets}
                 petsError={petsError}
-                canPrev={canPrev}
-                canNext={canNext}
-                loadPets={loadPets}
               />
             }
           />

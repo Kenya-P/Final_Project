@@ -1,0 +1,21 @@
+.petfinder-widget {
+  width: 100%;
+  margin: 24px 0 0;
+}
+
+.petfinder-widget__title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+/* Keep the widget from touching the edges on smaller screens */
+.petfinder-widget pet-scroller {
+  display: block;
+}
+
+.petfinder-widget__hint {
+  margin: 16px 0 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
