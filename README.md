@@ -1,50 +1,114 @@
-# Final_Project (Perfect Pet Finder 🐶🐱)
+# Perfect Pet Finder
 
-## 🧠 Project Overview
-A responsive full-stack React application that allows users to browse adoptable pets from a third-party API, create accounts, and save their favorite animals for later viewing. The app will help match users with pets based on preferences like type, size, location, and temperament.
+## Overview
+**Perfect Pet Finder** is a modern React application designed to help users discover adoptable pets through a clean, accessible interface. The project began as a fully custom integration with the Petfinder public API and was later **refactored in response to real‑world API deprecation**, demonstrating adaptability, architectural decision‑making, and third‑party integration skills.
 
---
+When Petfinder sunset their public API and transitioned to a Web Component–based widget, the application was re‑engineered to integrate the new data source while preserving application structure, routing, and user experience.
 
-## 🧱 Core Features
-1. User Authentication
+This project reflects how production applications evolve when external dependencies change.
 
-- Register/Login using email & password
-- JWT-based authentication
-- Persist login across sessions
+---
 
-2. Pet Search
+## Key Features
+- Responsive, multi‑page React application built with **Vite**
+- Integration of a third‑party **Web Component (`<pet-scroller>`)** within a React environment
+- Environment‑based configuration for external services
+- Modular component architecture following best practices
+- Graceful refactor from deprecated REST API to widget‑based solution
+- Clean UI optimized for accessibility and usability
 
-- Use a third-party API (e.g., Petfinder API) to fetch pet data (JSON)
-- Filter pets by type, location, age, etc.
-- Display data in reusable card components
+---
 
-3. Saved Pets
+## Technical Highlights
 
-- Logged-in users can favorite/save pets
-- Save to MongoDB and fetch upon profile visit
+### Real‑World API Migration
+- Initially implemented custom data fetching, filtering, pagination, and card rendering using the Petfinder API
+- Refactored application after API deprecation without breaking the overall app
+- Replaced API‑dependent logic with a Web Component while maintaining layout, routing, and state boundaries
 
-4. User Profile Page
+### Web Components + React
+- Safely loads third‑party scripts at the application entry point
+- Renders custom HTML elements within React components
+- Passes serialized configuration via environment variables
+- Maintains separation between third‑party UI and internal application logic
 
-- Show saved pets
-- Option to remove saved pets
+### Frontend Architecture
+- Component‑driven design
+- Route‑based page structure
+- Centralized environment configuration
+- Removal of dead code and legacy logic after refactor
 
-5. Responsive Design
+---
 
-- Mobile-first layout
-- Styled using BEM + reusable components
+## Tech Stack
+- **React**
+- **Vite**
+- **JavaScript (ES6+)**
+- **HTML5 / CSS3**
+- **Web Components**
+- **Environment Variables (.env)**
 
-### 🌍 Pages
-- / (Home page): Pet search and list
+---
 
-- /profile: Saved pets for the logged-in user
+## Project Structure (Simplified)
+```
+Frontend/
+├── src/
+│   ├── components/
+│   │   ├── PetScrollerWidget/
+│   │   ├── Header/
+│   │   ├── Footer/
+│   │   └── Main/
+│   ├── pages/
+│   ├── utils/
+│   └── main.jsx
+├── index.html
+├── package.json
+└── vite.config.js
+```
 
-- (Optional) /about: Info about the app or pet adoption tips
+---
 
-### 🖥️ Tech Stack
-- Frontend: React (with hooks, context), React Router, CSS Modules (BEM naming)
+## Configuration
+The Petfinder widget is configured using environment variables:
 
-- Backend: Node.js + Express
+```env
+VITE_PETFINDER_ORG_JSON=["YOUR_ORG_ID_HERE"]
+VITE_PETFINDER_LIMIT=12
+```
 
-- Database: MongoDB (for storing user data + saved pets)
+This approach keeps configuration flexible across development and production environments.
 
-- Auth: JWT for login persistence
+---
+
+## Lessons Learned
+- Designing applications that can adapt to external API changes
+- Integrating Web Components into a React ecosystem
+- Making architectural tradeoffs when full customization is no longer available
+- Refactoring legacy features safely and incrementally
+- Treating third‑party services as replaceable data sources
+
+---
+
+## Future Improvements
+- Add a "Saved Pets" feature using local storage
+- Extend user preferences outside the widget
+- Enhance accessibility and performance auditing
+
+---
+
+## Why This Project Matters
+This project demonstrates more than UI development — it shows:
+- Real‑world problem solving
+- Adaptability to breaking third‑party changes
+- Frontend architectural thinking
+- Production‑minded refactoring
+
+**Perfect Pet Finder** reflects the type of challenges engineers face in real applications, where requirements evolve and external systems change.
+
+---
+
+## Author
+**Kenya Peterson**
+
+Frontend Developer | React | JavaScript
