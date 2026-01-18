@@ -90,10 +90,26 @@ This approach keeps configuration flexible across development and production env
 
 ---
 
+## Saved Pets Feature (User-Owned Enhancement)
+
+To extend functionality beyond a third-party data source, the application includes a **Saved Pets** feature fully owned by the client application.
+
+### What It Does
+- Allows users to save pets they are interested in by storing Petfinder URLs
+- Persists saved pets using `localStorage`
+- Displays a Saved Pets counter badge in the navigation
+- Shows a preview of recently saved pets on the home page
+- Provides a dedicated Saved Pets page to view, remove, or clear saved items
+
+### Why It Matters
+This feature demonstrates how to add meaningful user-owned functionality alongside a third-party widget without modifying or relying on its internal implementation.
+
+---
+
 ## Future Improvements
-- Add a "Saved Pets" feature using local storage
-- Extend user preferences outside the widget
-- Enhance accessibility and performance auditing
+- Optional tagging or notes for saved pets
+- Backend persistence for authenticated users
+- Enhanced accessibility and performance audits
 
 ---
 
