@@ -1,0 +1,151 @@
+.saved {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.saved__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.saved__title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.saved__subtitle {
+  margin: 8px 0 0;
+  opacity: 0.85;
+}
+
+.saved__clear {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.saved__card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.saved__sectionTitle {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.saved__form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.saved__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.saved__label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.saved__input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.15);
+  color: inherit;
+}
+
+.saved__error {
+  margin: 0;
+  color: #ffb3b3;
+}
+
+.saved__submit {
+  align-self: flex-start;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.saved__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.saved__item {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.saved__itemLink {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.saved__itemNotes {
+  margin: 6px 0 0;
+  opacity: 0.9;
+}
+
+.saved__itemMeta {
+  margin: 6px 0 0;
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+.saved__remove {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  height: fit-content;
+}
+
+.saved__empty {
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 20px;
+  opacity: 0.9;
+}
+
+.saved__emptyTitle {
+  margin: 0;
+  font-weight: 600;
+}
+
+.saved__emptyText {
+  margin: 8px 0 0;
+  opacity: 0.85;
+}
+
+@media (max-width: 720px) {
+  .saved__row {
+    grid-template-columns: 1fr;
+  }
+  .saved__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

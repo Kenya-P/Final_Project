@@ -7,6 +7,7 @@ const noop = () => {};
 
 export default function Header({
   currentUser = null,
+  savedCount = 0,
   onLogin = noop,
   onRegister = noop,
   onLogout = noop,
@@ -21,8 +22,14 @@ export default function Header({
         <NavLink to="/" className="header__link">
           Home
         </NavLink>
-        <NavLink to="/profile" className="header__link">
+        <NavLink to="/saved" className="header__link">
           Saved Pets
+          <span
+            className="header__badge"
+            aria-label={`Saved pets: ${savedCount}`}
+          >
+            {savedCount}
+          </span>
         </NavLink>
         {!currentUser ? (
           <>
@@ -48,6 +55,7 @@ export default function Header({
 
 Header.propTypes = {
   currentUser: PropTypes.object,
+  savedCount: PropTypes.number,
   onLogin: PropTypes.func,
   onRegister: PropTypes.func,
   onLogout: PropTypes.func,

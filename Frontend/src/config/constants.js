@@ -1,4 +1,3 @@
-export const PAGE_LIMIT = 12;
 
 export const GENDER_OPTIONS = ['Male', 'Female', 'Unknown'];
 export const SIZE_OPTIONS = ['Small', 'Medium', 'Large', 'X-Large'];

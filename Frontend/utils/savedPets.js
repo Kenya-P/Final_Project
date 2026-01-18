@@ -1,18 +1,22 @@
-const keyFor = (userId = 'guest') => `ppf:saved:${userId}`;
+const STORAGE_KEY = "savedPets";
 
-export function loadSaved(userId = 'guest') {
-  try {
-    const raw = localStorage.getItem(keyFor(userId));
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
+export function getSavedPets() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+}
+
+export function savePet(pet) {
+  const pets = getSavedPets();
+  if (!pets.some(p => p.url === pet.url)) {
+    pets.push(pet);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pets));
   }
 }
 
-export function saveSaved(userId = 'guest', items = []) {
-  try {
-    localStorage.setItem(keyFor(userId), JSON.stringify(items));
-  } catch {
-    // ignore write errors
-  }
+export function removePet(url) {
+  const pets = getSavedPets().filter(p => p.url !== url);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(pets));
+}
+
+export function clearSavedPets() {
+  localStorage.removeItem(STORAGE_KEY);
 }
