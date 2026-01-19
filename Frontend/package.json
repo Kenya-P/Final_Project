@@ -10,7 +10,7 @@
     "format": "prettier --write .",
     "preview": "vite preview",
     "predeploy": "npm run build && cp dist/index.html dist/404.html",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist -b gh-pages -r https://github.com/Kenya-P/Final_Project.git --add"
   },
   "repository": {
     "type": "git",
