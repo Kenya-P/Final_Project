@@ -8,10 +8,10 @@ export default function PetScrollerWidget({
   limit = "12",
 }) {
   // Read env *safely* (these are strings at build time)
-  const envOrg =
-    import.meta.env.VITE_PETFINDER_ORG_JSON ||
-    import.meta.env.VITE_PETFINDER_ORG_IDS ||
-    "";
+const envOrg =
+  import.meta.env.VITE_PETFINDER_ORG_JSON ||
+  '["PA08","NY203","MD218","VA91","PA1308","CA2037"]';
+
 
   // Build the final organization JSON string:
   // - if organizationIds prop is provided, use it
